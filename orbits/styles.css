@@ -1,0 +1,9 @@
+.chart-orbits .tooltip { font-size: 11px; fill: black; }
+
+.chart-orbits .node text { fill: white; }
+.chart-orbits .node circle { fill-opacity: 0.8; }
+.chart-orbits .node:hover { cursor: pointer; }
+
+.chart-orbits .origin { fill-opacity: 0.5; }
+.chart-orbits .trace { fill: none; stroke: black; stroke-opacity: 0.2; }
+.chart-orbits .circle { fill: none; stroke: black; stroke-opacity: 0.5; stroke-width: 2px; stroke-dasharray: 5,5; }

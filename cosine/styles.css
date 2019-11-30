@@ -1,0 +1,7 @@
+.axis { fill: none; stroke: black; }
+.wedge { fill: #d62728; fill-opacity: 0.5; }
+.line { fill: none; stroke-width: 3px; }
+.line-0 { stroke: black; stroke-opacity: 0.3; }
+.line-1 { stroke: #1f77b4; }
+.line-2 { stroke: #d62728; }
+.circle { fill: #d62728; }
