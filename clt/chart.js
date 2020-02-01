@@ -9,7 +9,7 @@ var d3 = Object.assign({},
   require("d3-format"));
 
 import React from "react";
-import {Form, FormGroup, Col, FormControl, ControlLabel} from "react-bootstrap";
+import {Form, Row, Col} from "react-bootstrap";
 
 import "./styles.css";
 
@@ -22,28 +22,28 @@ var timer;
 
 export function controls() {
   return (
-    <Form horizontal>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={2}>
+    <Form>
+      <Form.Group as={Row}>
+        <Form.Label column md={2}>
           Number
-        </Col>
+        </Form.Label>
         <Col md={3}>
-         <FormControl id="control-clt-number" componentClass="select" defaultValue="4">
+         <Form.Control id="control-clt-number" as="select" defaultValue="4">
            <option value="1">n = 1</option>
            <option value="4">n = 4</option>
            <option value="8">n = 8</option>
            <option value="16">n = 16</option>
-         </FormControl>
+         </Form.Control>
         </Col>
-      </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={2}>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column md={2}>
           Speed
-        </Col>
-        <Col md={3} style={{paddingTop: 10}}>
+        </Form.Label>
+        <Col md={3} style={{paddingTop: 10}}>        
           <input id="control-clt-speed" type="range" min="0" max="1" defaultValue="0" step="0.01"/>
         </Col>
-      </FormGroup>
+      </Form.Group>
     </Form>
   );
 }

@@ -6,7 +6,7 @@ var d3 = Object.assign({},
   require("d3-hierarchy"));
 
 import React from "react";
-import {Form, FormGroup, Col, ControlLabel} from "react-bootstrap";
+import {Form, Row, Col} from "react-bootstrap";
 
 var url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?&table=exoplanets&select=pl_hostname,pl_orbsmax,pl_bmassj,pl_radj&where=pl_orbsmax%20is%20not%20null%20and%20pl_bmassj%20is%20not%20null%20and%20pl_radj%20is%20not%20null&format=csv";
 
@@ -20,26 +20,18 @@ export const sources = [
 
 export function controls() {
   return (
-    <Form horizontal>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={2}>
-          Sort By
+    <Form>
+      <Form.Group as={Row}>
+        <Form.Label column md={2}>
+          Sort by:
+        </Form.Label>
+        <Col md={10}>      
+          <Form.Check inline label="Nothing" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="undefined" defaultChecked/>
+          <Form.Check inline label="Radius" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="radius"/>
+          <Form.Check inline label="Mass" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="mass"/>
+          <Form.Check inline label="Separation" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="separation"/>
         </Col>
-        <Col md={10}>
-          <label className="radio-inline">
-            <input className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="" defaultChecked/> Nothing
-          </label>
-          <label className="radio-inline">
-            <input className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="radius"/> Radius
-          </label>
-          <label className="radio-inline">
-            <input className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="mass"/> Mass
-          </label>
-          <label className="radio-inline">
-            <input className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="separation"/> Separation
-          </label>
-        </Col>
-      </FormGroup>
+      </Form.Group>
     </Form>
   );
 }
@@ -86,7 +78,7 @@ export function create(el, props) {
     .clamp(true);
 
   function sortBy(prop) {
-    if (typeof location !== "undefined") {
+    if (typeof prop !== "undefined" && prop != "undefined") {
       return (a, b) => a.data[prop] - b.data[prop];
     } else {
       return (a, b) => Math.round(Math.random()) * 2 - 1;
@@ -99,8 +91,7 @@ export function create(el, props) {
         .remove();
 
       var root = d3.hierarchy({children: data})
-        .sum(d => d.radius)
-        .sort(sortBy(null));
+        .sum(d => d.radius);
 
       var nodes = svg.append("g")
         .attr("transform", `translate(${(width-size)/2},${(height-size)/2})`);
@@ -109,6 +100,7 @@ export function create(el, props) {
       svg.select(".node").each(focus); // focus on first node
 
       d3.selectAll(".control-exoplanets-sorting")
+        .select("input")
         .on("change", function() {
           root.sort(sortBy(this.value));
           render();

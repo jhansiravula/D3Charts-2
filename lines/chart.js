@@ -10,7 +10,7 @@ import numeric from "numeric";
 import Nest from "../tools/Nest";
 
 import React from "react";
-import {Button, ButtonToolbar, Form, FormGroup, Col, ControlLabel} from "react-bootstrap";
+import {Button, ButtonGroup, Form, Row, Col} from "react-bootstrap";
 
 export const id = "chart-lines";
 export const name = "Nested Sampling: Model Selection";
@@ -25,30 +25,30 @@ var sampling;
 
 export function controls() {
   return(
-    <Form horizontal>
-      <FormGroup style={{marginLeft: 0}}>
-        <ButtonToolbar>
-          <Button id="control-lines-sample" bsStyle="warning">New Data</Button>
-          <Button id="control-lines-start" bsStyle="success">Start Sampling</Button>
+    <Form style={{marginTop: 20}}>
+      <Form.Group>
+        <ButtonGroup>
+          <Button id="control-lines-sample" variant="warning">New Data</Button>
+          <Button id="control-lines-start" variant="success">Start Sampling</Button>
           <Button id="control-lines-abort">Abort Sampling</Button>
-        </ButtonToolbar>
-      </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={3}>
+        </ButtonGroup>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column md={4}>
           Strength of broad component
-        </Col>
-        <Col md={3} style={{paddingTop: 10}}>
+        </Form.Label>
+        <Col md={4} style={{paddingTop: 10}}>        
           <input id="control-lines-strength" type="range" min="0" max="0.5" defaultValue="0.4" step="0.01"/>
         </Col>
-      </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={3}>
+      </Form.Group>  
+      <Form.Group as={Row}>
+        <Form.Label column md={4}>
           Width of broad component
-        </Col>
-        <Col md={3} style={{paddingTop: 10}}>
+        </Form.Label>
+        <Col md={4} style={{paddingTop: 10}}>        
           <input id="control-lines-width" type="range" min="1" max="3" defaultValue="2.6" step="0.01"/>
         </Col>
-      </FormGroup>
+      </Form.Group>                  
     </Form>
     );
 }

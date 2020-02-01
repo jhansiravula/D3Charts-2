@@ -7,7 +7,7 @@ var d3 = Object.assign({},
   require("d3-voronoi"));
 
 import React from "react";
-import {Form, FormGroup, Col, FormControl, ControlLabel} from "react-bootstrap";
+import {Form, Row, Col} from "react-bootstrap";
 
 import "./styles.css";
 import dataSrc from "./data.json";
@@ -23,21 +23,21 @@ export const sources = [
 
 export function controls() {
   return (
-    <Form horizontal>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={2}>
+    <Form>
+      <Form.Group as={Row}>
+        <Form.Label column md={2}>
           Location
-        </Col>
+        </Form.Label>
         <Col md={5}>
-         <FormControl id="control-distance-location" componentClass="select" defaultValue="Any">
+         <Form.Control id="control-distance-location" as="select" defaultValue="Any">
            <option value="Any">Any</option>
            <option value="GC">Galactic Center</option>
            <option value="B">Bulge</option>
            <option value="DSN">Disk & Solar Neighborhood</option>
            <option value="IH">Halo</option>
-         </FormControl>
+         </Form.Control>
         </Col>
-      </FormGroup>
+      </Form.Group>
     </Form>
   );
 }

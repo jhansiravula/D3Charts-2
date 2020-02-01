@@ -7,7 +7,7 @@ import numeric from "numeric";
 import Nest from "../tools/Nest";
 
 import React from "react";
-import {Form, FormGroup, Button, ButtonToolbar} from "react-bootstrap";
+import {Form, Button, ButtonGroup} from "react-bootstrap";
 
 export const id = "chart-nest";
 export const name = "Nested Sampling: Eggbox Example";
@@ -21,13 +21,13 @@ var sampling;
 
 export function controls() {
   return(
-    <Form horizontal>
-      <FormGroup style={{marginLeft: 0}}>
-        <ButtonToolbar>
-          <Button id="control-nest-start" bsStyle="success">Start Sampling</Button>
+    <Form style={{marginTop: 20}}>
+      <Form.Group>
+        <ButtonGroup>
+          <Button id="control-nest-start" variant="success">Start Sampling</Button>
           <Button id="control-nest-abort">Abort Sampling</Button>
-        </ButtonToolbar>
-      </FormGroup>
+        </ButtonGroup>
+      </Form.Group>
     </Form>
     );
 }

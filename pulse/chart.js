@@ -7,7 +7,7 @@ var d3 = Object.assign({},
   require("d3-ease"));
 
 import React from "react";
-import {Row, Col, Form, FormGroup, ControlLabel} from "react-bootstrap";
+import {Form, Row, Col} from "react-bootstrap";
 
 export const id = "chart-pulse";
 export const name = "Wave Packets";
@@ -20,43 +20,43 @@ export function controls() {
   return (
     <Row>
       <Col md={6}>
-        <Form horizontal>
-          <FormGroup>
-            <Col componentClass={ControlLabel} xs={6}>
+        <Form>
+          <Form.Group as={Row}>
+            <Form.Label column xs={6}>
               Pulse Width \((\tau)\)
-            </Col>
-            <Col componentClass={ControlLabel} xs={6}>
+            </Form.Label>
+            <Form.Label column xs={6}>
               <input id="control-pulse-tau" type="range" min="1" max="5" defaultValue="1" step="1"/>
-            </Col>
-          </FormGroup>
-          <FormGroup>
-            <Col componentClass={ControlLabel} xs={6}>
+            </Form.Label>
+          </Form.Group>
+          <Form.Group as={Row}>
+            <Form.Label column xs={6}>
               Frequency \((\omega_0)\)
-            </Col>
-            <Col componentClass={ControlLabel} xs={6}>
+            </Form.Label>
+            <Form.Label column xs={6}>        
               <input id="control-pulse-w0" type="range" min="1" max="5" defaultValue="1" step="1"/>
-            </Col>
-          </FormGroup>
+            </Form.Label>
+          </Form.Group>
         </Form>
       </Col>
       <Col md={6}>
-        <Form horizontal>
-          <FormGroup>
-            <Col componentClass={ControlLabel} xs={6}>
+        <Form>
+          <Form.Group as={Row}>
+            <Form.Label column xs={6}>
               1. Wavenumber \((k_0)\)
-            </Col>
-            <Col componentClass={ControlLabel} xs={6}>
+            </Form.Label>
+            <Form.Label column xs={6}>
               <input id="control-pulse-k0" type="range" min="1" max="5" defaultValue="5" step="1"/>
-            </Col>
-          </FormGroup>
-          <FormGroup>
-            <Col componentClass={ControlLabel} xs={6}>
+            </Form.Label>
+          </Form.Group>
+          <Form.Group as={Row}>
+            <Form.Label column xs={6}>
               2. Wavenumber \((k′)\)
-            </Col>
-            <Col componentClass={ControlLabel} xs={6}>
+            </Form.Label>
+            <Form.Label column xs={6}>        
               <input id="control-pulse-k1" type="range" min="1" max="5" defaultValue="1" step="1"/>
-            </Col>
-          </FormGroup>
+            </Form.Label>
+          </Form.Group>
         </Form>
       </Col>
     </Row>

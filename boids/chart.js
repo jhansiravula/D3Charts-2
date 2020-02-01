@@ -8,7 +8,7 @@ var d3 = Object.assign({},
   require("d3-scale-chromatic"));
 
 import React from "react";
-import {Form, FormGroup, Col, ControlLabel} from "react-bootstrap";
+import {Form, FormGroup, Col, FormLabel} from "react-bootstrap";
 
 export const id = "chart-boids";
 export const name = "Boids";
@@ -19,31 +19,31 @@ var timer;
 
 export function controls() {
   return (
-    <Form horizontal>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={3}>
+    <Form>
+      <Form.Row>
+        <Col as={FormLabel} md={3}>
           Cohesion Force
         </Col>
-        <Col md={3} style={{paddingTop: 10}}>
+        <Col md={3} style={{paddingTop: 10}}>        
           <input id="control-boids-cohesion" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
-      </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={3}>
+      </Form.Row>
+      <Form.Row>
+        <Col as={FormLabel} md={3}>
           Alignment Force
         </Col>
-        <Col md={3} style={{paddingTop: 10}}>
+        <Col md={3} style={{paddingTop: 10}}>        
           <input id="control-boids-alignment" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
-      </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={3}>
+      </Form.Row>
+      <Form.Row>
+        <Col as={FormLabel} md={3}>
           Separation Force
         </Col>
-        <Col md={3} style={{paddingTop: 10}}>
+        <Col md={3} style={{paddingTop: 10}}>        
           <input id="control-boids-separation" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
-      </FormGroup>
+      </Form.Row>            
     </Form>
   );
 }

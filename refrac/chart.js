@@ -9,7 +9,7 @@ var d3 = Object.assign({},
 import {clamp} from "../tools/Math";
 
 import React from "react";
-import {Form, FormGroup, Col, Button, ControlLabel} from "react-bootstrap";
+import {Form, Row, Col, Button} from "react-bootstrap";
 
 import "./styles.css";
 
@@ -20,36 +20,32 @@ export const sources = [{url: "https://en.wikipedia.org/wiki/Refraction", descri
 
 export function controls() {
   return (
-    <Form horizontal>
-      <FormGroup>
+    <Form style={{marginTop: 20}}>
+      <Form.Group as={Row}>
         <Col md={3}>
         </Col>
         <Col md={9}>
-          <Button className="control" id="control-refrac-total" bsStyle="default">Total Reflection</Button>{" "}
-          <Button className="control" id="control-refrac-zero" bsStyle="default">No Reflection</Button>
+          <Button className="control" id="control-refrac-total" variant="dark">Total Reflection</Button>{" "}
+          <Button className="control" id="control-refrac-zero" variant="dark">No Reflection</Button>
         </Col>
-      </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={3}>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column md={3}>
           Refractive Index
-        </Col>
-        <Col md={6} style={{paddingTop: 10}}>
+        </Form.Label>
+        <Col md={6} style={{paddingTop: 10}}>        
           <input className="control" id="control-refrac-n" type="range" min="0.01" max="3" defaultValue="1.5" step="0.01"/>
         </Col>
-      </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={3}>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column md={3}>
           Polarization
-        </Col>
+        </Form.Label>
         <Col md={6}>
-          <label className="radio-inline">
-            <input className="control control-refrac-pol" type="radio" name="pol" defaultValue="s" defaultChecked/> Perpendicular
-          </label>
-          <label className="radio-inline">
-            <input className="control control-refrac-pol" type="radio" name="pol" defaultValue="p"/> Parallel
-          </label>
+          <Form.Check inline label="Perpendicular" className="control control-refrac-pol" type="radio" name="pol" defaultValue="s" defaultChecked/>
+          <Form.Check inline label="Parallel" className="control control-refrac-pol" type="radio" name="pol" defaultValue="p"/>
         </Col>
-      </FormGroup>
+      </Form.Group>
     </Form>
   );
 }
@@ -218,6 +214,7 @@ export function create(el, props) {
     });
 
   d3.selectAll(".control-refrac-pol")
+    .select("input")
     .on("change", function() {
       if (this.value == "s") state.pol = "s";
       if (this.value == "p") state.pol = "p";
