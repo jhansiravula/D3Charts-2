@@ -15,7 +15,7 @@ import "./styles.css";
 
 export const id = "chart-refrac";
 export const name = "Refraction of Light";
-export const readme = "The reflection and refraction of a light beam at the interface of a medium, as described by Snell's law and Fresnel's equations. Depending on the value of the refractive index and the polarization, the incoming beam can be fully reflected or fully refracted.";
+export const readme = "This interactive visualization demonstrates the reflection and refraction of a light beam at the interface of a medium, as described by Snell's law and Fresnel's equations. Depending on the value of the refractive index and the polarization, the incoming beam can be fully reflected or fully refracted.";
 export const sources = [{url: "https://en.wikipedia.org/wiki/Refraction", description: "Refraction (Wikipedia)"}];
 
 export function controls() {
@@ -41,7 +41,7 @@ export function controls() {
         <Form.Label column md={3}>
           Polarization
         </Form.Label>
-        <Col md={6}>
+        <Col md={6} style={{paddingTop: 5}}>
           <Form.Check inline label="Perpendicular" className="control control-refrac-pol" type="radio" name="pol" defaultValue="s" defaultChecked/>
           <Form.Check inline label="Parallel" className="control control-refrac-pol" type="radio" name="pol" defaultValue="p"/>
         </Col>

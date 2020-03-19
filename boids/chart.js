@@ -7,8 +7,10 @@ var d3 = Object.assign({},
   require("d3-timer"),
   require("d3-scale-chromatic"));
 
+import {Vec} from "../tools/Vector";
+
 import React from "react";
-import {Form, FormGroup, Col, FormLabel} from "react-bootstrap";
+import {Form, Row, Col} from "react-bootstrap";
 
 export const id = "chart-boids";
 export const name = "Boids";
@@ -20,30 +22,30 @@ var timer;
 export function controls() {
   return (
     <Form>
-      <Form.Row>
-        <Col as={FormLabel} md={3}>
+      <Form.Group as={Row}>
+        <Form.Label column md={2}>
           Cohesion Force
-        </Col>
-        <Col md={3} style={{paddingTop: 10}}>        
+        </Form.Label>
+        <Col md={2} style={{paddingTop: 10}}>     
           <input id="control-boids-cohesion" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
-      </Form.Row>
-      <Form.Row>
-        <Col as={FormLabel} md={3}>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column md={2}>
           Alignment Force
-        </Col>
-        <Col md={3} style={{paddingTop: 10}}>        
+        </Form.Label>
+        <Col md={2} style={{paddingTop: 10}}>   
           <input id="control-boids-alignment" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
-      </Form.Row>
-      <Form.Row>
-        <Col as={FormLabel} md={3}>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column md={2}>
           Separation Force
-        </Col>
-        <Col md={3} style={{paddingTop: 10}}>        
+        </Form.Label>
+        <Col md={2} style={{paddingTop: 10}}>    
           <input id="control-boids-separation" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
-      </Form.Row>            
+      </Form.Group>            
     </Form>
   );
 }
@@ -71,59 +73,6 @@ export function create(el, props) {
 
     var line = d3.line(),
         color = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, maxVelocity]);
-
-    function Vec(x, y) {
-      this.x = x || 0;
-      this.y = y || 0;
-      return this;
-    }
-
-    Vec.prototype.clone = function() {
-      return new Vec(this.x, this.y);
-    };
-
-    Vec.prototype.length = function() {
-      return Math.sqrt(this.x*this.x + this.y*this.y);
-    };
-
-    Vec.prototype.plus = function(v) {
-      this.x += v.x;
-      this.y += v.y;
-      return this;
-    };
-
-    Vec.prototype.minus = function(v) {
-      this.x -= v.x;
-      this.y -= v.y;
-      return this;
-    };
-
-    Vec.prototype.scale = function(x) {
-      this.x *= x;
-      this.y *= x;
-      return this;
-    };
-
-    Vec.prototype.normalize = function(x) {
-      x = typeof x !== "undefined" ? x : 1;
-      var length = this.length();
-      if (length > 0) {
-        return this.scale(x/length);
-      }
-      else {
-        return this;
-      }
-    };
-
-    Vec.prototype.truncate = function(x) {
-      var length = this.length();
-      if (length > x) {
-        return this.normalize(x);
-      }
-      else {
-        return this;
-      }
-    };
 
     var randomX = d3.randomUniform(0, width),
         randomY = d3.randomUniform(0, height),

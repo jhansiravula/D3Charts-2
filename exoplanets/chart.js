@@ -25,7 +25,7 @@ export function controls() {
         <Form.Label column md={2}>
           Sort by:
         </Form.Label>
-        <Col md={10}>      
+        <Col md={10} style={{paddingTop: 5}}>      
           <Form.Check inline label="Nothing" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="undefined" defaultChecked/>
           <Form.Check inline label="Radius" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="radius"/>
           <Form.Check inline label="Mass" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="mass"/>

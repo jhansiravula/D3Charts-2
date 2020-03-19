@@ -11,7 +11,7 @@ import dataSrc from "./data.csv";
 
 export const id = "chart-moon";
 export const name = "Lunar Craters";
-export const readme = "The distribution of large lunar craters with diameters greater than 50 km.";
+export const readme = "Shown on this moon globe are all large lunar craters (with diameters greater than 50 km).";
 export const sources = [
   {url: "http://adsabs.harvard.edu/abs/2010Sci...329.1504H", description: "Head et al. 2010"},
   {url: "http://adsabs.harvard.edu/abs/2011LPI....42.1006K", description: "Kadish et al. 2011"},
@@ -82,7 +82,7 @@ export function create(el, props) {
     function start() {
       return d3.interval(function() {
         var origin = projection.rotate();
-        origin[0] += 0.2;
+        origin[0] += 0.1;
         projection.rotate(origin);
         render();
       }, 20);

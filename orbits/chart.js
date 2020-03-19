@@ -16,7 +16,7 @@ import dataSrc from "./stars.json";
 
 export const id = "chart-orbits";
 export const name = "The S-Stars: Astrometry";
-export const readme = "The motions of a few S-stars as they appear on the sky, while they orbit the supermassive black hole at the center of the Milky Way. The paths are interpolated on the fly from the measured orbital elements. The dashed circle has a diameter of just 0.5'' (or about 23 light days).";
+export const readme = "This visualisation shows the motions of a few of the S-stars as they appear on the sky, while they orbit the supermassive black hole at the center of the Milky Way. The paths are interpolated on the fly from the measured orbital elements. The dashed circle has a diameter of just 0.5'' (or about 23 light days).";
 export const sources = [{url: "http://dx.doi.org/10.1088/0004-637X/692/2/1075", description: "Gillessen+ 2009" }];
 
 export function controls() {}
@@ -128,7 +128,7 @@ export function create(el, props) {
     }
 
     var simulation = d3.forceSimulation()
-      .force("collision", d3.forceCollide().radius(d => d.r));
+      .force("collision", d3.forceCollide().radius(d => d.r + 1));
 
     var nodes = d3.entries(orbits);
     nodes.forEach(d => d.r = 35 - d.value.mag);

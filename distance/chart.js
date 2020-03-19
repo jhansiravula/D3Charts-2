@@ -14,7 +14,7 @@ import dataSrc from "./data.json";
 
 export const id = "chart-distance";
 export const name = "The Distance to the Galactic Center";
-export const readme = "A compilation of recent measurements of the distance to the Galactic Center, based on different methods.";
+export const readme = "This chart shows a compilation of recent measurements of the distance to the Galactic Center, based on different methods.";
 export const sources = [
   {url: "http://dx.doi.org/10.1146/annurev-astro-081915-023441", description: "Bland-Hawthorn & Gerhard 2016"},
   {url: "http://iopscience.iop.org/article/10.3847/0004-637X/830/1/17", description: "Boehle et al. 2016"},

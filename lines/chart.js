@@ -14,7 +14,7 @@ import {Button, ButtonGroup, Form, Row, Col} from "react-bootstrap";
 
 export const id = "chart-lines";
 export const name = "Nested Sampling: Model Selection";
-export const readme = "The nested sampling algorithm can be used to calculate the Bayesian evidence, which is helpful for model selection. Test whether this data of a spectral line favors a model including a broad component \\((K>10)\\), or not!";
+export const readme = "The nested sampling algorithm can be used to calculate the Bayesian evidence, which is helpful for model selection. In this example, it is tested whether data of a spectral line favors a model including a broad component \\((K>10)\\), or not.";
 export const sources = [
   {url: "https://en.wikipedia.org/wiki/Nested_sampling_algorithm", description: "Nested Sampling Algorithm (Wikipedia)"},
   {url: "https://en.wikipedia.org/wiki/Bayes_factor", description: "Bayes Factor (Wikipedia)"},
@@ -272,14 +272,15 @@ export function create(el, props) {
   function clearChart() {
     svg.selectAll(".line").remove();
     d3.select(".info").text("");
-    d3.selectAll(".legend").style("font-weight", "normal");
+    d3.selectAll(".legend").style("opacity", 0).style("font-weight", "normal"); 
   }
 
   function updateInfo(resultA, resultB) {
     var K = 10*(resultB.logz - resultA.logz)/Math.log(10);
     var Kerr = 10*Math.sqrt(resultB.logzerr**2 + resultA.logzerr**2)/Math.log(10);
     svg.select(".info").text(`K = ${d3.format(".1f")(K)} ± ${d3.format(".1f")(Kerr)} ban`);
-    d3.select(".legend.B").style("font-weight", () => K > 10 ? "bold" : "normal");
+    d3.select(".legend.B").style("opacity", 1).style("font-weight", () => K >= 10 ? "bold" : "normal");
+    d3.select(".legend.A").style("opacity", 1).style("font-weight", () => K < 10 ? "bold" : "normal");
   }
 
   function start() {
