@@ -11,56 +11,84 @@ var d3 = Object.assign({},
 import {Vec} from "../tools/Vector";
 
 import React from "react";
-import {Form, Row, Col, Button} from "react-bootstrap";
+import {Form, Container, Row, Col, Button} from "react-bootstrap";
 
 import "./styles.css";
 
 export const id = "chart-simulitis";
 export const name = "Simulitis";
-export const readme = "This simulation tracks the spread of a fictional desease by contact in a population of moving, blue circles. The red-color desease will spread quickly as soon as the three inially infected circles start to bump into others, thus transmitting the infection. Any infected circle that turns sick after the 'incubation time' is, by default, immediately isolated (excluded from the simulation) until it recovers its blue color after the 'recovery time', or dies. Note that a recovered circle can not be infected again, and that each simulation will yield a somewhat different result because the initial configuration of the circles is random.";
+export const readme = "This simulation tracks the spread of a fictional desease by contact in a population of blue circles, a fraction of which are stationary, and the rest of which are moving. The red-color desease will spread quickly as soon as the three inially infected circles start to bump into others, thus transmitting the infection. Any infected circle that turns sick after the 'incubation time' is, by default, immediately isolated (excluded from the simulation) until it recovers its blue color after the 'recovery time', or dies. Note that a recovered circle can not be infected again, and that each simulation will yield a somewhat different result because the initial configuration of the circles is random.";
 export const sources = [{url: "https://www.washingtonpost.com/graphics/2020/world/corona-simulator/", description: "Corona Simulator (Washington Post)"}];
 
 var simulationTimer, plotTimer;
 
 export function controls() {
   return (
-    <Form>
-      <Form.Group>
-        <Button id="control-simulitis-restart" variant="success">Restart Simulation</Button>
-      </Form.Group>
-      <Form.Group as={Row}>
-        <Form.Label column md={2}>
-          Incubation Time
-        </Form.Label>
-        <Col md={3} style={{paddingTop: 10}}>        
-          <input id="control-simulitis-incubationTime" type="range" min="1000" max="9000" defaultValue="3000" step="100"/>
+    <Container>
+      <Row>
+        <Col md={6}>
+          <Form>
+            <Form.Group>
+              <Button id="control-simulitis-restart" variant="success">Restart Simulation</Button>
+            </Form.Group>
+          </Form>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row}>
-        <Form.Label column md={2}>
-          Recovery Time
-        </Form.Label>
-        <Col md={3} style={{paddingTop: 10}}>        
-          <input id="control-simulitis-recoveryTime" type="range" min="1000" max="9000" defaultValue="3000" step="100"/>
+        <Col md={6}>
+          <Form>
+            <Form.Group as={Row}>
+              <Form.Label column xs={3}>
+                Isolation
+              </Form.Label>
+              <Col xs={9} style={{paddingTop: 5}}>        
+                <input id="control-simulitis-enableIsolation" type="checkbox" defaultChecked/>
+              </Col>
+            </Form.Group>
+          </Form>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row}>
-        <Form.Label column md={2}>
-          Fatality Rate
-        </Form.Label>
-        <Col md={3} style={{paddingTop: 10}}>        
-          <input id="control-simulitis-fatalityRate" type="range" min="0" max="1" defaultValue="0.01" step="0.01"/>
+      </Row>
+      <Row>
+        <Col md={6}>
+          <Form>
+            <Form.Group as={Row}>
+              <Form.Label column xs={6}>
+                Incubation Time
+              </Form.Label>
+              <Col xs={6} style={{paddingTop: 10}}>
+                <input id="control-simulitis-incubationTime" type="range" min="1000" max="9000" defaultValue="3000" step="100"/>
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column xs={6}>
+                Recovery Time
+              </Form.Label>
+              <Col xs={6} style={{paddingTop: 10}}>        
+                <input id="control-simulitis-recoveryTime" type="range" min="1000" max="9000" defaultValue="3000" step="100"/>
+              </Col>
+            </Form.Group>
+          </Form>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row}>
-        <Form.Label column md={2}>
-          Isolation
-        </Form.Label>
-        <Col md={3} style={{paddingTop: 5}}>        
-          <input id="control-simulitis-enableIsolation" type="checkbox" defaultChecked/>
+        <Col md={6}>
+          <Form>
+            <Form.Group as={Row}>
+              <Form.Label column xs={6}>
+                Movement
+              </Form.Label>
+              <Col xs={6} style={{paddingTop: 10}}>
+                <input id="control-simulitis-movementRate" type="range" min="0.1" max="1" defaultValue="0.9" step="0.05"/>
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column xs={6}>
+                Fatality Rate
+              </Form.Label>
+              <Col xs={6} style={{paddingTop: 10}}>        
+                <input id="control-simulitis-fatalityRate" type="range" min="0" max="1" defaultValue="0.01" step="0.01"/>
+              </Col>
+            </Form.Group>
+          </Form>
         </Col>
-      </Form.Group>
-    </Form>
+      </Row>
+    </Container>
   );   
 }
 
@@ -88,6 +116,7 @@ export function create(el, props) {
       recoveryTime = 3000,
       fatalityRate = 0.01,
       enableIsolation = true,
+      movementRate = 0.9,
       data = [];
 
   var simulationArea = svg.append("g");
@@ -207,36 +236,33 @@ export function create(el, props) {
     }
   }
 
-  function propagate(d, t)
-  {
+  function propagate(d, t) {
     d.hasInteracted = false; // reset interaction check
 
     if (d.isDead)
       return;
 
-    if (d.isSick && (t - d.infectionTime > incubationTime + recoveryTime))
-    {
+    if (d.isSick && (t - d.infectionTime > incubationTime + recoveryTime)) {
       // this circle either recovers or dies at this time
       d.isSick = false;
       d.isInfected = false;
-      if (randomProb() < fatalityRate)
-      {
+      if (randomProb() < fatalityRate) {
         d.isDead = true;
         return;
       }
-      else
-      {
+      else {
         d.isRecovered = true;
       }
     }
-    else if (d.isInfected && (t - d.infectionTime > incubationTime))
-    {
+    else if (d.isInfected && (t - d.infectionTime > incubationTime)) {
       // this circle becomes sick at this time
       d.isSick = true;
     }
 
-    if (enableIsolation && d.isSick)
+    if ((enableIsolation && d.isSick) || !d.isMoving) {
+      d.vel = new Vec(0, 0);
       return;
+    }
 
     d.pos.plus(d.vel);
   }
@@ -257,6 +283,7 @@ export function create(el, props) {
       pos: generatePosVec(),
       vel: generateVelVec(),
       hasInteracted: false,
+      isMoving: randomProb() < movementRate,
       isInfected: i < 3, // start with a few infected circles
       infectionTime: 0,
       infectionCount: 0,
@@ -264,7 +291,13 @@ export function create(el, props) {
       isRecovered: false,
       isDead: false
     }));
-    
+
+    // ensure that initially infected circles are moving
+    data.forEach(d => {
+      if (d.isInfected)
+        d.isMoving = true;
+    });
+
     simulationTimer = d3.interval(updateSimulation, 20);
     plotTimer = d3.interval(updatePlot, 40);
   }
@@ -346,6 +379,9 @@ export function create(el, props) {
 
   d3.select("#control-simulitis-recoveryTime")
     .on("change", function() { recoveryTime = +this.value; restart(); });
+
+  d3.select("#control-simulitis-movementRate")
+    .on("change", function() { movementRate = +this.value; restart(); });
 
   d3.select("#control-simulitis-fatalityRate")
     .on("change", function() { fatalityRate = +this.value; restart(); });
