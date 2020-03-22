@@ -25,7 +25,7 @@ export function controls() {
             <Form.Label column xs={6}>
               Pulse Width \((\tau)\)
             </Form.Label>
-            <Col xs={6}>
+            <Col xs={6} style={{paddingTop: 10}}>
               <input id="control-pulse-tau" type="range" min="1" max="5" defaultValue="1" step="1"/>
             </Col>
           </Form.Group>
@@ -33,7 +33,7 @@ export function controls() {
             <Form.Label column xs={6}>
               Frequency \((\omega_0)\)
             </Form.Label>
-            <Col xs={6}>        
+            <Col xs={6} style={{paddingTop: 10}}>        
               <input id="control-pulse-w0" type="range" min="1" max="5" defaultValue="1" step="1"/>
             </Col>
           </Form.Group>
@@ -45,7 +45,7 @@ export function controls() {
             <Form.Label column xs={6}>
               1. Wavenumber \((k_0)\)
             </Form.Label>
-            <Col xs={6}>
+            <Col xs={6} style={{paddingTop: 10}}>
               <input id="control-pulse-k0" type="range" min="1" max="5" defaultValue="5" step="1"/>
             </Col>
           </Form.Group>
@@ -53,7 +53,7 @@ export function controls() {
             <Form.Label column xs={6}>
               2. Wavenumber \((k′)\)
             </Form.Label>
-            <Col xs={6}>        
+            <Col xs={6} style={{paddingTop: 10}}>        
               <input id="control-pulse-k1" type="range" min="1" max="5" defaultValue="1" step="1"/>
             </Col>
           </Form.Group>
