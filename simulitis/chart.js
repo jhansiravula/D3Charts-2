@@ -204,19 +204,16 @@ export function create(el, props) {
         separation = d1d2.length();
 
     if (separation < 2 * radius) {
-      if ((d1.isSick && d2.isSick) || d1.isRecovered || d2.isRecovered)
-      {
+      if ((d1.isSick && d2.isSick) || d1.isRecovered || d2.isRecovered) {
         // sick or recovered circles can not be infected again
       }
-      else if (d1.isInfected && !d2.isInfected)
-      {
+      else if (d1.isInfected && !d2.isInfected) {
         // circle 1 infects circle 2 at this time
         d2.isInfected = true;
         d2.infectionTime = t;
         d1.infectionCount += 1;
       }
-      else if (!d1.isInfected && d2.isInfected)
-      {
+      else if (!d1.isInfected && d2.isInfected) {
         // cicle 2 infects circle 1 at this time
         d1.isInfected = true;
         d1.infectionTime = t;
@@ -224,12 +221,23 @@ export function create(el, props) {
       }
 
       // update velocities
-      d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2)/(separation*separation)));
-      d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1)/(separation*separation)));
-
-      // update positions (ensure complete separation after collision)
-      d1.pos = pos.clone().plus(d1d2.clone().scale(1.001*radius/separation));
-      d2.pos = pos.clone().minus(d1d2.clone().scale(1.001*radius/separation));
+      var eps = 0.0001;
+      if (d1.isMoving && d2.isMoving) {
+        var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2)/(separation*separation));
+        var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1)/(separation*separation));
+        d1.vel.minus(dvel1);
+        d2.vel.minus(dvel2);
+        d1.pos = pos.clone().plus(d1d2.clone().scale((1+eps)*radius/separation)); // ensure separation after collision
+        d2.pos = pos.clone().minus(d1d2.clone().scale((1+eps)*radius/separation));
+      }
+      else if (d1.isMoving && !d2.isMoving) {
+        d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2)/(separation*separation)).scale(2));
+        d1.pos.plus(d1d2.clone().scale((1+eps)*radius/separation));
+      }
+      else if (!d1.isMoving && d2.isMoving) {
+        d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1)/(separation*separation)).scale(2));
+        d2.pos.plus(d2d1.clone().scale((1+eps)*radius/separation));
+      }
 
       d1.hasInteracted = true;
       d2.hasInteracted = true;
@@ -259,12 +267,11 @@ export function create(el, props) {
       d.isSick = true;
     }
 
-    if ((enableIsolation && d.isSick) || !d.isMoving) {
-      d.vel = new Vec(0, 0);
+    if (enableIsolation && d.isSick)
       return;
-    }
 
-    d.pos.plus(d.vel);
+    if (d.isMoving)
+      d.pos.plus(d.vel);
   }
 
   function restart() {
@@ -281,21 +288,26 @@ export function create(el, props) {
     // generate a new circle population
     data = d3.range(n).map((i) => ({
       pos: generatePosVec(),
-      vel: generateVelVec(),
-      hasInteracted: false,
       isMoving: randomProb() < movementRate,
       isInfected: i < 3, // start with a few infected circles
       infectionTime: 0,
       infectionCount: 0,
       isSick: false,
       isRecovered: false,
-      isDead: false
+      isDead: false,
+      hasInteracted: false
     }));
 
-    // ensure that initially infected circles are moving
     data.forEach(d => {
+      // initially infected circles shall move
       if (d.isInfected)
         d.isMoving = true;
+
+      // generate velocities
+      if (d.isMoving)
+        d.vel =  generateVelVec();
+      else
+        d.vel = new Vec(0, 0);
     });
 
     simulationTimer = d3.interval(updateSimulation, 20);
