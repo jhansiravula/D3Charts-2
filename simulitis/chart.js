@@ -5,8 +5,7 @@ var d3 = Object.assign({},
   require("d3-random"),
   require("d3-array"),
   require("d3-axis"),
-  require("d3-timer"),
-  require("d3-scale-chromatic"));
+  require("d3-timer"));
 
 import {Vec} from "../tools/Vector";
 
