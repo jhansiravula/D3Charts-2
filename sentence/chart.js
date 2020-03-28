@@ -32,7 +32,7 @@ export function controls() {
           Source Text
         </Form.Label>
         <Col md={5}>
-         <Form.Control id="control-sentence-text" as="select" defaultText={defaultText}>
+         <Form.Control id="control-sentence-text" as="select" defaultValue={defaultText}>
             <option value="pg174.txt">The Picture of Dorian Gray</option>
             <option value="pg1260.txt">Jane Eyre</option>
             <option value="pg1400.txt">Great Expectations</option>
