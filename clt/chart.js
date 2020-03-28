@@ -119,8 +119,11 @@ export function create(el, props) {
     .text(d => d.label);
 
   function renderBars() {
+    if (counts.length < 1)
+      return;
+
     var data = histogram(counts)
-      .map(d => { d.y = counts.length > 0 ? d.length/counts.length : 0; return d; })
+      .map(d => { d.y = d.length/counts.length; return d; })
       .filter(d => d.x1 > d.x0);
 
     var ymax = d3.max(data, d => d.y);
@@ -140,15 +143,19 @@ export function create(el, props) {
       .attr("dy", 10)
       .attr("dominant-baseline", "hanging")
       .attr("text-anchor", "middle");
+  
+    bar = g.merge(bar);
 
-    bar.select("rect").transition().duration(dt/4)
+    var t = d3.transition().duration(dt/4);
+
+    bar.select("rect").transition(t)
       .attr("height", d => y(d.y / (1/20)));
-
+  
     bar.select("text")
       .text(d => d.y > 0 ? d3.format(".0%")(d.y) : "");
 
     svg.select(".line").datum(d3.range(0, 1.05, 0.05).map(x => [x, pdf(x)]))
-      .transition().duration(dt/4)
+      .transition(t)
         .attr("d", area);
   }
 
