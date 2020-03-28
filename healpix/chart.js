@@ -17,7 +17,8 @@ export const id = "chart-healpix";
 export const name = "HealPix";
 export const readme = "Example of a HealPix grid, mapped using different projections.";
 export const sources = [
-  {url: "http://tdc-www.harvard.edu/catalogs/bsc5.html", description: "Yale Bright Star Catalog"}];
+  {url: "http://tdc-www.harvard.edu/catalogs/bsc5.html", description: "Yale Bright Star Catalog"},
+  {url: "https://github.com/healpy/healpy", description: "Healpy"}];
 
 var timer;
 
