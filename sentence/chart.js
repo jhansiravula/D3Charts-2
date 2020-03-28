@@ -18,8 +18,8 @@ export const id = "chart-sentence";
 export const name = "Sentence Diagrams";
 export const readme = "In these diagrams, each line segment represents one sentence in the source text, and the length of each segment is proportional to the number of words in the corresponding sentence.";
 export const sources = [
-  {url: "http://www.stefanieposavec.com/writing-without-words", description: "Writing Without Words (Stefanie Posavec)"},
-  {url: "https://github.com/vlandham/sentence_drawings", description: "Sentence Drawings in D3 (Jim Vallandingham)"},
+  {url: "http://www.stefanieposavec.com/writing-without-words", description: ["Writing Without Words", "(S. Posavec)"]},
+  {url: "https://github.com/vlandham/sentence_drawings", description: ["Sentence Drawings in D3", "(J. Vallandingham)"]},
   {url: "https://www.gutenberg.org/", description: "Project Gutenberg"}];
 
 const defaultText = "pg174.txt";

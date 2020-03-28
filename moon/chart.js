@@ -13,10 +13,10 @@ export const id = "chart-moon";
 export const name = "Lunar Craters";
 export const readme = "Shown on this moon globe are all large lunar craters (with diameters greater than 50 km).";
 export const sources = [
-  {url: "http://adsabs.harvard.edu/abs/2010Sci...329.1504H", description: "Head et al. 2010"},
-  {url: "http://adsabs.harvard.edu/abs/2011LPI....42.1006K", description: "Kadish et al. 2011"},
+  {url: "https://doi.org/10.1126/science.1195050", description: "Head+ 2010"},
+  {url: "http://adsabs.harvard.edu/abs/2011LPI....42.1006K", description: "Kadish+ 2011"},
   {url: "http://www.planetary.brown.edu/html_pages/LOLAcraters.html", description: "LOLA Lunar Crater Data"},
-  {url: "http://youtu.be/sNUNB6CMnE8", description: "Rotating Moon from LRO"}];
+  {url: "http://youtu.be/sNUNB6CMnE8", description: ["Rotating Moon from LRO", "(Youtube)"]}];
 
 var timer;
 

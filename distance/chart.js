@@ -16,10 +16,10 @@ export const id = "chart-distance";
 export const name = "The Distance to the Galactic Center";
 export const readme = "This chart shows a compilation of recent measurements of the distance to the Galactic Center, based on different methods.";
 export const sources = [
-  {url: "http://dx.doi.org/10.1146/annurev-astro-081915-023441", description: "Bland-Hawthorn & Gerhard 2016"},
-  {url: "http://iopscience.iop.org/article/10.3847/0004-637X/830/1/17", description: "Boehle et al. 2016"},
-  {url: "http://iopscience.iop.org/article/10.3847/1538-4357/aa5c41", description: "Gillessen et al. 2017"},
-  {url: "http://www.aanda.org/10.1051/0004-6361/201833718", description: "GRAVITY Collab. 2018"}];
+  {url: "https://doi.org/10.1146/annurev-astro-081915-023441", description: "Bland-Hawthorn & Gerhard 2016"},
+  {url: "https://doi.org/10.3847/0004-637X/830/1/17", description: "Boehle+ 2016"},
+  {url: "https://doi.org/10.3847/1538-4357/aa5c41", description: "Gillessen+ 2017"},
+  {url: "https://doi.org/10.1051/0004-6361/201833718", description: "GRAVITY Collab. 2018"}];
 
 export function controls() {
   return (

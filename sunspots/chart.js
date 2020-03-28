@@ -15,8 +15,8 @@ export const id = "chart-sunspots";
 export const name = "Sunspots";
 export const readme = "This butterfly diagram shows the latitude distribution of sunspot groups over several past solar cycles.";
 export const sources = [
-  {url: "https://www.ngdc.noaa.gov/stp/solar/sunspotregionsdata.html", description: "NOAA Solar Region Data (Mt. Wilson Tilt)"},
-  {url: "https://en.wikipedia.org/wiki/Solar_cycle#Sunspots", description: "Solar Cycle (Wikipedia)"}];
+  {url: "https://www.ngdc.noaa.gov/stp/solar/sunspotregionsdata.html", description: ["NOAA Solar Region Data", "(Mt. Wilson Tilt)"]},
+  {url: "https://en.wikipedia.org/wiki/Solar_cycle#Sunspots", description: ["Solar Cycle", "(Wikipedia)"]}];
 
 export function controls() {}
 

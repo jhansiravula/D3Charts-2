@@ -16,10 +16,10 @@ export const id = "chart-lines";
 export const name = "Nested Sampling: Model Selection";
 export const readme = "The nested sampling algorithm can be used to calculate the Bayesian evidence, which is helpful for model selection. In this example, it is tested whether data of a spectral line favors a model including a broad component \\((K>10)\\), or not.";
 export const sources = [
-  {url: "https://en.wikipedia.org/wiki/Nested_sampling_algorithm", description: "Nested Sampling Algorithm (Wikipedia)"},
-  {url: "https://en.wikipedia.org/wiki/Bayes_factor", description: "Bayes Factor (Wikipedia)"},
-  {url: "http://adsabs.harvard.edu/abs/2004AIPC..735..395S", description: "Skilling+ 2014"},
-  {url: "https://github.com/kbarbary/nestle", description: "nestle.py (K. Barbary)"}];
+  {url: "https://en.wikipedia.org/wiki/Nested_sampling_algorithm", description: ["Nested Sampling Algorithm", "(Wikipedia)"]},
+  {url: "https://en.wikipedia.org/wiki/Bayes_factor", description: ["Bayes Factor", "(Wikipedia)"]},
+  {url: "https://doi.org/10.1063/1.1835238", description: "Skilling+ 2014"},
+  {url: "https://github.com/kbarbary/nestle", description: ["nestle.py", "(K. Barbary)"]}];
 
 var sampling;
 

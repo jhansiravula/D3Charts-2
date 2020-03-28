@@ -17,7 +17,8 @@ import "./styles.css";
 export const id = "chart-simulitis";
 export const name = "Simulitis";
 export const readme = "This simulation tracks the spread of a fictional desease by contact in a population of blue circles, a fraction of which are stationary, and the rest of which are moving. The red-color desease will spread quickly as soon as the three inially infected circles start to bump into others, thus transmitting the infection. Any infected circle that turns sick after the 'incubation time' is, by default, immediately isolated (excluded from the simulation) until it recovers its blue color after the 'recovery time', or dies. Note that a recovered circle can not be infected again, and that each simulation will yield a somewhat different result because the initial configuration of the circles is random.";
-export const sources = [{url: "https://www.washingtonpost.com/graphics/2020/world/corona-simulator/", description: "Corona Simulator (Washington Post)"}];
+export const sources = [
+  {url: "https://www.washingtonpost.com/graphics/2020/world/corona-simulator/", description: ["Corona Simulator", "(Washington Post)"]}];
 
 var simulationTimer, plotTimer;
 
@@ -35,10 +36,10 @@ export function controls() {
         <Col md={6}>
           <Form>
             <Form.Group as={Row}>
-              <Form.Label column xs={3}>
+              <Form.Label column xs={6}>
                 Isolation
               </Form.Label>
-              <Col xs={9} style={{paddingTop: 5}}>        
+              <Col xs={6} style={{paddingTop: 5}}>        
                 <input id="control-simulitis-enableIsolation" type="checkbox" defaultChecked/>
               </Col>
             </Form.Group>

@@ -11,7 +11,8 @@ import "./styles.css";
 export const id = "chart-cosine";
 export const name = "The Cosine Curve";
 export const readme = "This animation demonstrates the relationship of \\(\\cos(x)\\) to the circle.";
-export const sources = [{url: "https://en.wikipedia.org/wiki/Trigonometric_functions", description: "Trigonometric Functions (Wikipedia)"}];
+export const sources = [
+  {url: "https://en.wikipedia.org/wiki/Trigonometric_functions", description: ["Trigonometric Functions", "(Wikipedia)"]}];
 
 var timer;
 

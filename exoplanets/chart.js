@@ -15,7 +15,7 @@ export const name = "Exoplanets";
 export const readme = "This chart summarizes a few key properties of confirmed exoplanets in the NASA exoplanet archive.";
 export const sources = [
   {url: "https://exoplanetarchive.ipac.caltech.edu/", description: "NASA Exoplanet Archive"},
-  {url: "http://xkcd.com/1071/", description: "xkcd 1071"},
+  {url: "http://xkcd.com/1071/", description: "xkcd #1071"},
   {url: "http://bl.ocks.org/mbostock/3007180", description: "block #3007180"}];
 
 export function controls() {
