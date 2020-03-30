@@ -7,7 +7,7 @@ const d3 = Object.assign({},
   require("d3-voronoi"));
 
 import React from "react";
-import {Form, Row, Col} from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 
 import "./styles.css";
 import dataSrc from "./data.json";
@@ -16,10 +16,11 @@ export const id = "distance";
 export const name = "The Distance to the Galactic Center";
 export const readme = "This chart shows a compilation of recent measurements of the distance to the Galactic Center, based on different methods.";
 export const sources = [
-  {url: "https://doi.org/10.1146/annurev-astro-081915-023441", description: "Bland-Hawthorn & Gerhard 2016"},
-  {url: "https://doi.org/10.3847/0004-637X/830/1/17", description: "Boehle+ 2016"},
-  {url: "https://doi.org/10.3847/1538-4357/aa5c41", description: "Gillessen+ 2017"},
-  {url: "https://doi.org/10.1051/0004-6361/201833718", description: "GRAVITY Collab. 2018"}];
+  { url: "https://doi.org/10.1146/annurev-astro-081915-023441", description: "Bland-Hawthorn & Gerhard 2016" },
+  { url: "https://doi.org/10.3847/0004-637X/830/1/17", description: "Boehle+ 2016" },
+  { url: "https://doi.org/10.3847/1538-4357/aa5c41", description: "Gillessen+ 2017" },
+  { url: "https://doi.org/10.1051/0004-6361/201833718", description: "GRAVITY Collab. 2018" }
+];
 
 export function controls() {
   return (
@@ -43,18 +44,17 @@ export function controls() {
 }
 
 export function create(el, props) {
-  var margin = {top: 20, right: 20, bottom: 30, left: 40};
+  var margin = { top: 20, right: 20, bottom: 30, left: 40 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+  var svg = d3.select(el).append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
   var x = d3.scaleTime().domain([new Date(2004, 8), new Date(2019, 1)]).range([0, width]),
       y = d3.scaleLinear().domain([6, 10]).range([height, 0]);
@@ -79,11 +79,11 @@ export function create(el, props) {
   svg.append("text")
     .attr("class", "reference")
     .attr("x", 10)
-    .attr("y", height-10);
+    .attr("y", height - 10);
 
   function average(data) {
-    var weights = data.map(d => 1/(d.error*d.error));
-    return d3.sum(data.map((d, i) => d.value*weights[i]))/d3.sum(weights);
+    var weights = data.map(d => 1 / (d.error * d.error));
+    return d3.sum(data.map((d, i) => d.value * weights[i])) / d3.sum(weights);
   }
 
   d3.json(dataSrc).then(function(data) {
@@ -96,6 +96,7 @@ export function create(el, props) {
       .x(d => x(d.date))
       .y(d => y(d.value))
       .extent([[0, 0], [width, height]]);
+
     var polygons = voronoi(data).polygons();
 
     var points = svg.selectAll(".point").data(data)
@@ -114,23 +115,22 @@ export function create(el, props) {
     points.append("line")
       .attr("x1", d => x(d.date))
       .attr("x2", d => x(d.date))
-      .attr("y1", d => y(d.value-d.error))
-      .attr("y2", d => y(d.value+d.error));
+      .attr("y1", d => y(d.value - d.error))
+      .attr("y2", d => y(d.value + d.error));
 
     points.on("mouseover", function(d) {
       if (d3.select(this).classed("selected")) {
         d3.selectAll(".point").classed("hover", false);
         d3.select(this).classed("hover", true);
-        svg.select(".reference")
-          .text(`${d.reference} using ${d.method}`);
+        svg.select(".reference").text(`${d.reference} using ${d.method}`);
       }
     });
 
     function change(location) {
       function isSelected(d) {
-        return (typeof location === "undefined")
-            || (location === "Any")
-            || (d.location.indexOf(location) !== -1);
+        return (typeof location === "undefined") ||
+          (location === "Any") ||
+          (d.location.indexOf(location) !== -1);
       }
 
       points.each(function(d) {

@@ -7,10 +7,10 @@ const d3 = Object.assign({},
   require("d3-axis"),
   require("d3-timer"));
 
-import {Vec} from "../tools/Vector";
+import { Vec } from "../tools/Vector";
 
 import React from "react";
-import {Form, Container, Row, Col, Button} from "react-bootstrap";
+import { Form, Container, Row, Col, Button } from "react-bootstrap";
 
 import "./styles.css";
 
@@ -18,7 +18,8 @@ export const id = "simulitis";
 export const name = "Simulitis";
 export const readme = "This simulation tracks the spread of a fictional desease by contact in a population of blue circles, a fraction of which are stationary, and the rest of which are moving. The red-color desease will spread quickly as soon as the three inially infected circles start to bump into others, thus transmitting the infection. Any infected circle that turns sick after the 'incubation time' is, by default, immediately isolated (excluded from the simulation) until it recovers its blue color after the 'recovery time', or dies. Note that a recovered circle can not be infected again, and that each simulation will yield a somewhat different result because the initial configuration of the circles is random.";
 export const sources = [
-  {url: "https://www.washingtonpost.com/graphics/2020/world/corona-simulator/", description: ["Corona Simulator", "(Washington Post)"]}];
+  { url: "https://www.washingtonpost.com/graphics/2020/world/corona-simulator/", description: ["Corona Simulator", "(Washington Post)"] }
+];
 
 var simulationTimer, plotTimer;
 
@@ -89,24 +90,23 @@ export function controls() {
         </Col>
       </Row>
     </Container>
-  );   
+  );
 }
 
 export function create(el, props) {
-  var margin = {top: 20, right: 30, bottom: 20, left: 10};
+  var margin = { top: 20, right: 30, bottom: 20, left: 10 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-  var size = 0.96 * d3.min([width/2, height]);
-    
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`)
+  var size = 0.96 * d3.min([width / 2, height]);
+
+  var svg = d3.select(el).append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
 
   // simulation parameters
   var n = 100,
@@ -116,8 +116,9 @@ export function create(el, props) {
       recoveryTime = 3000,
       fatalityRate = 0.01,
       enableIsolation = true,
-      movementRate = 0.9,
-      data = [];
+      movementRate = 0.9;
+
+  var data = [];
 
   var simulationArea = svg.append("g");
 
@@ -166,23 +167,19 @@ export function create(el, props) {
 
   function handleBoundaries(d) {
     var bounds = [radius, size - radius];
-    if (d.pos.x < bounds[0])
-    {
+    if (d.pos.x < bounds[0]) {
       d.pos.x = bounds[0];
       d.vel.x *= -1;
     }
-    if (d.pos.x > bounds[1])
-    {
+    if (d.pos.x > bounds[1]) {
       d.pos.x = bounds[1];
       d.vel.x *= -1;
     }
-    if (d.pos.y < bounds[0])
-    {
+    if (d.pos.y < bounds[0]) {
       d.pos.y = bounds[0];
       d.vel.y *= -1;
     }
-    if (d.pos.y > bounds[1])
-    {
+    if (d.pos.y > bounds[1]) {
       d.pos.y = bounds[1];
       d.vel.y *= -1;
     }
@@ -206,14 +203,12 @@ export function create(el, props) {
     if (separation < 2 * radius) {
       if ((d1.isSick && d2.isSick) || d1.isRecovered || d2.isRecovered) {
         // sick or recovered circles can not be infected again
-      }
-      else if (d1.isInfected && !d2.isInfected) {
+      } else if (d1.isInfected && !d2.isInfected) {
         // circle 1 infects circle 2 at this time
         d2.isInfected = true;
         d2.infectionTime = t;
         d1.infectionCount += 1;
-      }
-      else if (!d1.isInfected && d2.isInfected) {
+      } else if (!d1.isInfected && d2.isInfected) {
         // cicle 2 infects circle 1 at this time
         d1.isInfected = true;
         d1.infectionTime = t;
@@ -223,20 +218,18 @@ export function create(el, props) {
       // update velocities
       var eps = 0.0001;
       if (d1.isMoving && d2.isMoving) {
-        var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2)/(separation*separation));
-        var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1)/(separation*separation));
+        var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (separation * separation));
+        var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (separation * separation));
         d1.vel.minus(dvel1);
         d2.vel.minus(dvel2);
-        d1.pos = pos.clone().plus(d1d2.clone().scale((1+eps)*radius/separation)); // ensure separation after collision
-        d2.pos = pos.clone().minus(d1d2.clone().scale((1+eps)*radius/separation));
-      }
-      else if (d1.isMoving && !d2.isMoving) {
-        d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2)/(separation*separation)).scale(2));
-        d1.pos.plus(d1d2.clone().scale((1+eps)*radius/separation));
-      }
-      else if (!d1.isMoving && d2.isMoving) {
-        d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1)/(separation*separation)).scale(2));
-        d2.pos.plus(d2d1.clone().scale((1+eps)*radius/separation));
+        d1.pos = pos.clone().plus(d1d2.clone().scale((1 + eps) * radius / separation)); // ensure separation after collision
+        d2.pos = pos.clone().minus(d1d2.clone().scale((1 + eps) * radius / separation));
+      } else if (d1.isMoving && !d2.isMoving) {
+        d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (separation * separation)).scale(2));
+        d1.pos.plus(d1d2.clone().scale((1 + eps) * radius / separation));
+      } else if (!d1.isMoving && d2.isMoving) {
+        d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (separation * separation)).scale(2));
+        d2.pos.plus(d2d1.clone().scale((1 + eps) * radius / separation));
       }
 
       d1.hasInteracted = true;
@@ -257,12 +250,10 @@ export function create(el, props) {
       if (randomProb() < fatalityRate) {
         d.isDead = true;
         return;
-      }
-      else {
+      } else {
         d.isRecovered = true;
       }
-    }
-    else if (d.isInfected && (t - d.infectionTime > incubationTime)) {
+    } else if (d.isInfected && (t - d.infectionTime > incubationTime)) {
       // this circle becomes sick at this time
       d.isSick = true;
     }
@@ -305,7 +296,7 @@ export function create(el, props) {
 
       // generate velocities
       if (d.isMoving)
-        d.vel =  generateVelVec();
+        d.vel = generateVelVec();
       else
         d.vel = new Vec(0, 0);
     });
@@ -334,8 +325,7 @@ export function create(el, props) {
     var totalInfected = d3.sum(data, d => d.isInfected);
 
     // stop when no infected circles are left
-    if (totalInfected == 0)
-    {
+    if (totalInfected == 0) {
       simulationTimer.stop();
       plotTimer.stop();
 
@@ -344,22 +334,21 @@ export function create(el, props) {
     }
   }
 
-  function updatePlot(t)
-  {
+  function updatePlot(t) {
     xScale = xScale.domain([0, t]);
 
     var totalInfected = d3.sum(data, d => d.isInfected),
         totalSick = d3.sum(data, d => d.isSick),
         totalDead = d3.sum(data, d => d.isDead);
 
-    plotArea.select("path.healthy").datum()
-      .push({x: t, y: n - totalInfected - totalDead});
+    plotArea.select("path.healthy")
+      .datum().push({ x: t, y: n - totalInfected - totalDead });
 
-    plotArea.select("path.infected").datum()
-      .push({x: t, y: totalInfected});
+    plotArea.select("path.infected")
+      .datum().push({ x: t, y: totalInfected });
 
-    plotArea.select("path.sick").datum()
-      .push({x: t, y: totalSick});
+    plotArea.select("path.sick")
+      .datum().push({ x: t, y: totalSick });
 
     plotArea.select("path.healthy")
       .attr("d", line);
@@ -401,7 +390,7 @@ export function create(el, props) {
   d3.select("#control-simulitis-enableIsolation")
     .on("change", function() { enableIsolation = this.checked; restart(); });
 
-  restart();       
+  restart();
 }
 
 export function destroy() {

@@ -10,16 +10,17 @@ import numeric from "numeric";
 import Nest from "../tools/Nest";
 
 import React from "react";
-import {Button, ButtonGroup, Form, Row, Col} from "react-bootstrap";
+import { Button, ButtonGroup, Form, Row, Col } from "react-bootstrap";
 
 export const id = "lines";
 export const name = "Nested Sampling: Model Selection";
 export const readme = "The nested sampling algorithm can be used to calculate the Bayesian evidence, which is helpful for model selection. In this example, it is tested whether data of a spectral line favors a model including a broad component \\((K>10)\\), or not.";
 export const sources = [
-  {url: "https://en.wikipedia.org/wiki/Nested_sampling_algorithm", description: ["Nested Sampling Algorithm", "(Wikipedia)"]},
-  {url: "https://en.wikipedia.org/wiki/Bayes_factor", description: ["Bayes Factor", "(Wikipedia)"]},
-  {url: "https://doi.org/10.1063/1.1835238", description: "Skilling+ 2014"},
-  {url: "https://github.com/kbarbary/nestle", description: ["nestle.py", "(K. Barbary)"]}];
+  { url: "https://en.wikipedia.org/wiki/Nested_sampling_algorithm", description: ["Nested Sampling Algorithm", "(Wikipedia)"] },
+  { url: "https://en.wikipedia.org/wiki/Bayes_factor", description: ["Bayes Factor", "(Wikipedia)"] },
+  { url: "https://doi.org/10.1063/1.1835238", description: "Skilling+ 2014" },
+  { url: "https://github.com/kbarbary/nestle", description: ["nestle.py", "(K. Barbary)"] }
+];
 
 var sampling;
 
@@ -50,31 +51,29 @@ export function controls() {
         </Col>
       </Form.Group>                  
     </Form>
-    );
+  );
 }
 
 export function create(el, props) {
   Nest.delay = 0;
 
-  var margin = {top: 20, right: 10, bottom: 20, left: 10};
+  var margin = { top: 20, right: 10, bottom: 20, left: 10 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+  var svg = d3.select(el).append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  var color = {A: "#1f77b4", B: "#d62728"};
+  var color = { A: "#1f77b4", B: "#d62728" };
 
   svg.selectAll(".lines")
-    .data([{key: "A"}, {key: "B"}])
-  .enter()
-    .append("g")
+    .data([{ key: "A" }, { key: "B" }])
+  .enter().append("g")
     .attr("class", d => `lines ${d.key}`)
     .style("stroke", d => color[d.key]);
 
@@ -83,9 +82,11 @@ export function create(el, props) {
   .append("path")
     .attr("class", "truth");
 
-  svg.append("text").selectAll("tspan").data([
-    {key: "B", label: "Narrow plus broad component"},
-    {key: "A", label: "Single component"}])
+  svg.append("text").selectAll("tspan")
+    .data([
+      { key: "B", label: "Narrow plus broad component" },
+      { key: "A", label: "Single component" }
+    ])
   .enter().append("tspan")
     .attr("class", d => `legend ${d.key}`)
     .text(d => d.label)
@@ -99,7 +100,7 @@ export function create(el, props) {
     .style("font-size", "150%");
 
   function f(x, dx) {
-    return Math.exp(-x*x/(2*dx*dx));
+    return Math.exp(-x * x / (2 * dx * dx));
   }
 
   var xscale = d3.scaleLinear()
@@ -115,8 +116,8 @@ export function create(el, props) {
     .y(function(d) { return yscale(d[1]); });
 
   function linspace(domain, n) {
-    var dx = (domain[1] - domain[0])/(n - 1);
-    return d3.range(n).map(function(i) { return domain[0] + i*dx; });
+    var dx = (domain[1] - domain[0]) / (n - 1);
+    return d3.range(n).map(function(i) { return domain[0] + i * dx; });
   }
 
   function randspace(domain, n) {
@@ -168,9 +169,8 @@ export function create(el, props) {
     var points = svg.select(".points").selectAll(".point")
       .data(state.data);
 
-    var g = points.enter()
-      .append("g")
-        .attr("class", "point");
+    var g = points.enter().append("g")
+      .attr("class", "point");
 
     g.append("line")
       .style("stroke", "black")
@@ -208,19 +208,19 @@ export function create(el, props) {
       })
     }));
 
-    lines.enter()
-      .append("path")
-        .attr("class", "line")
-        .style("stroke-width", 1)
-        .style("stroke-opacity", 0.2)
+    lines.enter().append("path")
+      .attr("class", "line")
+      .style("stroke-width", 1)
+      .style("stroke-opacity", 0.2)
     .merge(lines)
       .attr("d", line);
+
     lines.exit()
       .remove();
   }
 
   function prior_uniform(x, a, b) {
-    return a + (b - a)*x;
+    return a + (b - a) * x;
   }
 
   function prior_transform(u) {
@@ -245,12 +245,12 @@ export function create(el, props) {
 
   function loglikelihood(v) {
     if (v.length === 4) {
-      var dy = state.data.map(function(d) { return (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3])))/state.sigma; });
+      var dy = state.data.map(function(d) { return (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]))) / state.sigma; });
     } else if (v.length === 6) {
-      var dy = state.data.map(function(d) { return (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]) + v[4] * f(d[0] - v[2], v[5])))/state.sigma; });
+      var dy = state.data.map(function(d) { return (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]) + v[4] * f(d[0] - v[2], v[5]))) / state.sigma; });
     }
 
-    return -numeric.sum(numeric.pow(dy, 2))/2;
+    return -numeric.sum(numeric.pow(dy, 2)) / 2;
   }
 
   sampling = [$.Deferred(), $.Deferred()];
@@ -272,12 +272,12 @@ export function create(el, props) {
   function clearChart() {
     svg.selectAll(".line").remove();
     d3.select(".info").text("");
-    d3.selectAll(".legend").style("opacity", 0).style("font-weight", "normal"); 
+    d3.selectAll(".legend").style("opacity", 0).style("font-weight", "normal");
   }
 
   function updateInfo(resultA, resultB) {
-    var K = 10*(resultB.logz - resultA.logz)/Math.log(10);
-    var Kerr = 10*Math.sqrt(resultB.logzerr**2 + resultA.logzerr**2)/Math.log(10);
+    var K = 10 * (resultB.logz - resultA.logz) / Math.log(10);
+    var Kerr = 10 * Math.sqrt(resultB.logzerr ** 2 + resultA.logzerr ** 2) / Math.log(10);
     svg.select(".info").text(`K = ${d3.format(".1f")(K)} ± ${d3.format(".1f")(Kerr)} ban`);
     d3.select(".legend.B").style("opacity", 1).style("font-weight", () => K >= 10 ? "bold" : "normal");
     d3.select(".legend.A").style("opacity", 1).style("font-weight", () => K < 10 ? "bold" : "normal");

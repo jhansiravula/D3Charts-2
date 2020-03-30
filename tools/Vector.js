@@ -9,7 +9,7 @@ Vec.prototype.clone = function() {
 };
 
 Vec.prototype.length = function() {
-  return Math.sqrt(this.x*this.x + this.y*this.y);
+  return Math.sqrt(this.x * this.x + this.y * this.y);
 };
 
 Vec.prototype.plus = function(v) {
@@ -34,9 +34,8 @@ Vec.prototype.normalize = function(x) {
   x = typeof x !== "undefined" ? x : 1;
   var length = this.length();
   if (length > 0) {
-    return this.scale(x/length);
-  }
-  else {
+    return this.scale(x / length);
+  } else {
     return this;
   }
 };
@@ -45,8 +44,7 @@ Vec.prototype.truncate = function(x) {
   var length = this.length();
   if (length > x) {
     return this.normalize(x);
-  }
-  else {
+  } else {
     return this;
   }
 };
@@ -54,4 +52,3 @@ Vec.prototype.truncate = function(x) {
 Vec.prototype.dot = function(v) {
   return this.x * v.x + this.y * v.y;
 };
-

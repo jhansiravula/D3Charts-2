@@ -9,7 +9,7 @@ const d3 = Object.assign({},
   require("d3-format"));
 
 import React from "react";
-import {Form, Row, Col} from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 
 import "./styles.css";
 
@@ -17,7 +17,8 @@ export const id = "clt";
 export const name = "The Central Limit Theorem";
 export const readme = "Let \\(x_1 \\dots x_n\\) be a set of independent, identically distributed random variables following a distribution \\(f\\) with mean \\(\\mu\\) and finite variance \\(\\sigma^2\\). In the limit of large \\(n\\), the arithmetic mean \\[\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n}x_i\\] follows a normal distribution with mean \\(\\mu\\) and variance \\(\\frac{\\sigma^2}{n}\\). This holds regardless of the specific form of \\(f\\). In this example, \\(f\\) is a uniform distribution (set \\(n = 1\\) to see this) and \\(n = 4\\) by default.";
 export const sources = [
-  {url: "https://en.wikipedia.org/wiki/Central_limit_theorem", description: ["Central Limit Theorem", "(Wikipedia)"]}];
+  { url: "https://en.wikipedia.org/wiki/Central_limit_theorem", description: ["Central Limit Theorem", "(Wikipedia)"] }
+];
 
 var timer;
 
@@ -50,18 +51,17 @@ export function controls() {
 }
 
 export function create(el, props) {
-  var margin = {top: 20, right: 10, bottom: 20, left: 10};
+  var margin = { top: 20, right: 10, bottom: 20, left: 10 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+  var svg = d3.select(el).append("svg")
+   .attr("width", "100%")
+   .attr("height", "100%")
+   .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+   .attr("preserveAspectRatio", "xMidYMid meet")
+  .append("g")
+   .attr("transform", `translate(${margin.left},${margin.top})`);
 
   var dt = 1000, // time step
       n = 4; // sample size
@@ -72,11 +72,11 @@ export function create(el, props) {
 
   var f = {
     sample: Math.random,
-    mu: 1/2,
-    sigma: 1/(2*Math.sqrt(3))
+    mu: 1 / 2,
+    sigma: 1 / (2 * Math.sqrt(3))
   };
 
-  var pdf = function(x) { return Math.sqrt(n)*Math.exp(-n*(x-f.mu)*(x-f.mu)/(2*f.sigma*f.sigma))/Math.sqrt(2*Math.PI)/f.sigma; };
+  var pdf = x => Math.sqrt(n) * Math.exp(-n * (x - f.mu) * (x - f.mu) / (2 * f.sigma * f.sigma)) / Math.sqrt(2 * Math.PI) / f.sigma;
 
   var x = d3.scaleLinear()
     .domain([0, 1])
@@ -99,13 +99,16 @@ export function create(el, props) {
     .y1(d => y2 + y(d[1]))
     .curve(d3.curveBasis);
 
-  svg.append("path").attr("class", "line");
-  svg.append("g").attr("class", "bars");
+  svg.append("path")
+    .attr("class", "line");
+
+  svg.append("g")
+    .attr("class", "bars");
 
   var counts = [];
 
   var axis = svg.selectAll(".axis")
-      .data([{y: 0, label: "draw"}, {y: y1, label: "average"}, {y: y2, label: "count"}])
+    .data([{ y: 0, label: "draw" }, { y: y1, label: "average" }, { y: y2, label: "count" }])
     .enter().append("g")
       .attr("class", "axis")
       .attr("transform", d => `translate(0,${d.y})`);
@@ -123,11 +126,11 @@ export function create(el, props) {
       return;
 
     var data = histogram(counts)
-      .map(d => { d.y = d.length/counts.length; return d; })
+      .map(d => { d.y = d.length / counts.length; return d; })
       .filter(d => d.x1 > d.x0);
 
     var ymax = d3.max(data, d => d.y);
-    y.domain([0, ymax / (1/20)]);
+    y.domain([0, ymax / (1 / 20)]);
 
     var bar = svg.select(".bars").selectAll(".bar").data(data);
 
@@ -139,24 +142,26 @@ export function create(el, props) {
       .attr("width", d => (x(d.x1) - x(d.x0)) - 2);
 
     g.append("text")
-      .attr("x", x(1/40))
+      .attr("x", x(1 / 40))
       .attr("dy", 10)
       .attr("dominant-baseline", "hanging")
       .attr("text-anchor", "middle");
-  
+
     bar = g.merge(bar);
 
-    var t = d3.transition().duration(dt/4);
+    var t = d3.transition().duration(dt / 4);
 
-    bar.select("rect").transition(t)
-      .attr("height", d => y(d.y / (1/20)));
-  
+    bar.select("rect")
+      .transition(t)
+      .attr("height", d => y(d.y / (1 / 20)));
+
     bar.select("text")
       .text(d => d.y > 0 ? d3.format(".0%")(d.y) : "");
 
-    svg.select(".line").datum(d3.range(0, 1.05, 0.05).map(x => [x, pdf(x)]))
+    svg.select(".line")
+      .datum(d3.range(0, 1.05, 0.05).map(x => [x, pdf(x)]))
       .transition(t)
-        .attr("d", area);
+      .attr("d", area);
   }
 
   function renderBalls() {
@@ -171,25 +176,25 @@ export function create(el, props) {
       .attr("cx", d => x(d))
       .attr("cy", 0)
       .attr("r", 5)
-    .transition().duration(dt).ease(d3.easeBounce)
+      .transition().duration(dt).ease(d3.easeBounce)
       .attr("cy", y1 - 5)
       .on("end", function() {
         d3.select(this)
-          .transition().duration(dt/4)
-            .attr("cy", (y2 + y1) / 2)
-          .transition().duration(dt/4)
-            .attr("cx", x(mean))
-          .transition().duration(dt/4).ease(d3.easeBounce)
-            .attr("cy", y2 - 3)
-            .attr("r", 3)
-            .each(() => ++i)
-            .on("end", function() {
-              if (!--i) {
-                counts.push(mean);
-              } else {
-                d3.select(this).remove();
-              }
-            });
+          .transition().duration(dt / 4)
+          .attr("cy", (y2 + y1) / 2)
+          .transition().duration(dt / 4)
+          .attr("cx", x(mean))
+          .transition().duration(dt / 4).ease(d3.easeBounce)
+          .attr("cy", y2 - 3)
+          .attr("r", 3)
+          .each(() => ++i)
+          .on("end", function() {
+            if (!--i) {
+              counts.push(mean);
+            } else {
+              d3.select(this).remove();
+            }
+          });
       });
   }
 

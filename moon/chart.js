@@ -13,10 +13,11 @@ export const id = "moon";
 export const name = "Lunar Craters";
 export const readme = "Shown on this moon globe are all large lunar craters (with diameters greater than 50 km).";
 export const sources = [
-  {url: "https://doi.org/10.1126/science.1195050", description: "Head+ 2010"},
-  {url: "http://adsabs.harvard.edu/abs/2011LPI....42.1006K", description: "Kadish+ 2011"},
-  {url: "http://www.planetary.brown.edu/html_pages/LOLAcraters.html", description: "LOLA Lunar Crater Data"},
-  {url: "http://youtu.be/sNUNB6CMnE8", description: ["Rotating Moon from LRO", "(Youtube)"]}];
+  { url: "https://doi.org/10.1126/science.1195050", description: "Head+ 2010" },
+  { url: "http://adsabs.harvard.edu/abs/2011LPI....42.1006K", description: "Kadish+ 2011" },
+  { url: "http://www.planetary.brown.edu/html_pages/LOLAcraters.html", description: "LOLA Lunar Crater Data" },
+  { url: "http://youtu.be/sNUNB6CMnE8", description: ["Rotating Moon from LRO", "(Youtube)"] }
+];
 
 var timer;
 
@@ -26,24 +27,27 @@ export function create(el, props) {
   var width = 960,
       height = 500;
 
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+  var svg = d3.select(el).append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
 
-  var graticule = d3.geoGraticule(),
-      projection = d3.geoOrthographic()
-        .rotate([0, 0])
-        .translate([width/2, height/2])
-        .scale(200)
-        .clipAngle(90),
-      path = d3.geoPath().projection(projection),
-      circle = d3.geoCircle()
-        .center(d => [d.Lon, d.Lat])
-        .radius(d => d.Diam_km/2/1737*180/Math.PI)
-        .precision(20);
+  var graticule = d3.geoGraticule();
+
+  var projection = d3.geoOrthographic()
+    .rotate([0, 0])
+    .translate([width / 2, height / 2])
+    .scale(200)
+    .clipAngle(90);
+
+  var path = d3.geoPath()
+    .projection(projection);
+
+  var circle = d3.geoCircle()
+    .center(d => [d.Lon, d.Lat])
+    .radius(d => d.Diam_km / 2 / 1737 * 180 / Math.PI)
+    .precision(20);
 
   svg.append("rect")
     .attr("width", width)
@@ -119,7 +123,8 @@ export function create(el, props) {
     d.Lon = +d.Lon;
     d.Lat = +d.Lat;
     d.Diam_km = +d.Diam_km;
-    if (d.Diam_km > 50) return d;
+    if (d.Diam_km > 50)
+      return d;
   }
 }
 

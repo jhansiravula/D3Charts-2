@@ -17,8 +17,9 @@ export const id = "healpix";
 export const name = "HealPix";
 export const readme = "Example of a HealPix grid, mapped using different projections.";
 export const sources = [
-  {url: "http://tdc-www.harvard.edu/catalogs/bsc5.html", description: "Yale Bright Star Catalog"},
-  {url: "https://github.com/healpy/healpy", description: "Healpy"}];
+  { url: "http://tdc-www.harvard.edu/catalogs/bsc5.html", description: "Yale Bright Star Catalog" },
+  { url: "https://github.com/healpy/healpy", description: "Healpy" }
+];
 
 var timer;
 
@@ -28,12 +29,11 @@ export function create(el, props) {
   var width = 960,
       height = 500;
 
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+  var svg = d3.select(el).append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
 
   svg.append("path")
     .datum(d3.geoGraticule().outline)
@@ -41,8 +41,8 @@ export function create(el, props) {
     .style("stroke", "black")
     .style("stroke-width", 3);
 
-  function deg2rad(x) { return x * Math.PI/180; };
-  function rad2deg(x) { return x * 180/Math.PI; };
+  var deg2rad = x => x * Math.PI / 180,
+      rad2deg = x => x * 180 / Math.PI;
 
   var options = [
     { name: "Aitoff", projection: d3.geoAitoff() },
@@ -90,7 +90,8 @@ export function create(el, props) {
     //{ name: "van der Grinten IV", projection: d3.geoVanDerGrinten4() },
     { name: "Wagner IV", projection: d3.geoWagner4() },
     //{ name: "Wagner VI", projection: d3.geoWagner6() },
-    { name: "Winkel Tripel", projection: d3.geoWinkel3()}];
+    { name: "Winkel Tripel", projection: d3.geoWinkel3() }
+  ];
 
   function getProjection() {
     var i = Math.floor(d3.randomUniform(options.length)());
@@ -116,7 +117,7 @@ export function create(el, props) {
           coordinates: boundary.map(ang => {
             var lon = rad2deg(ang.lon),
                 lat = rad2deg(ang.lat);
-            return [180-lon, lat];
+            return [180 - lon, lat];
           })
         },
         properties: {
@@ -150,14 +151,14 @@ export function create(el, props) {
           d3.select(this).selectAll("path")
             .attr("stroke-opacity", 1)
             .transition()
-            .delay(2/6*dt)
-            .duration(1/6*dt)
+            .delay(2 / 6 * dt)
+            .duration(1 / 6 * dt)
             .attr("stroke-opacity", 0)
             .transition()
-            .duration(2/6*dt)
+            .duration(2 / 6 * dt)
             .attrTween("d", projectionTween(projection, projection = getProjection()))
             .transition()
-            .duration(1/6*dt)
+            .duration(1 / 6 * dt)
             .attr("stroke-opacity", 1)
             .transition();
         });
@@ -175,14 +176,15 @@ export function create(el, props) {
       var t = 0;
 
       var projection = d3.geoProjection(project)
-          .scale(1)
-          .translate([width/2, height/2]);
+        .scale(1)
+        .translate([width / 2, height / 2]);
 
       var path = d3.geoPath(projection);
 
       function project(lon, lat) {
         lon = rad2deg(lon), lat = rad2deg(lat);
-        var p0 = projection0([lon, lat]), p1 = projection1([lon, lat]);
+        var p0 = projection0([lon, lat]),
+            p1 = projection1([lon, lat]);
         return [(1 - t) * p0[0] + t * p1[0], (1 - t) * -p0[1] + t * -p1[1]];
       }
 

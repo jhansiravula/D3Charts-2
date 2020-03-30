@@ -1,4 +1,4 @@
-import {range, min, max} from "d3-array";
+import { range, min, max } from "d3-array";
 
 var eps = 1e-6;
 
@@ -41,13 +41,13 @@ function XY2xy(XY, nside) {
       hp_frac = XY % (nside * nside);
 
   assert(hp >= 0);
-  assert(hp < 12);        
+  assert(hp < 12);
 
   var x = fix(hp_frac / nside);
 
   assert(x >= 0);
   assert(x < nside);
-  
+
   var y = hp_frac % nside;
 
   assert(y >= 0);
@@ -69,7 +69,7 @@ function xy2XY(xy, nside) {
   assert(xy.y >= 0);
   assert(xy.y < nside);
 
-  return (xy.hp * nside * nside) + (xy.x * nside) + xy.y;  
+  return (xy.hp * nside * nside) + (xy.x * nside) + xy.y;
 }
 
 function xy2xyz(xy, nside, dx, dy) {
@@ -102,7 +102,7 @@ function xy2xyz(xy, nside, dx, dy) {
 
     x /= nside;
     y /= nside;
-  
+
     if (hp <= 3) {
       phioff = 1;
     } else if (hp <= 7) {
@@ -115,27 +115,28 @@ function xy2xyz(xy, nside, dx, dy) {
     } else {
       assert(false);
     }
-  
-    z = 2/3*(x + y + zoff);
-    phi = Math.PI/4*(x - y + phioff + 2*hp);
-  
+
+    z = 2 / 3 * (x + y + zoff);
+    phi = Math.PI / 4 * (x - y + phioff + 2 * hp);
+
   } else {
     var phi_t;
 
     if (zfactor == -1) {
-      var tmp = x; x = y; y = tmp;
+      var tmp = x;
+      x = y;
+      y = tmp;
       x = nside - x;
       y = nside - y;
     }
 
     if (y == nside && x == nside) {
       phi_t = 0;
-    }
-    else {
-      phi_t = Math.PI * (nside-y) / (2 * ((nside-x) + (nside-y)));
+    } else {
+      phi_t = Math.PI * (nside - y) / (2 * ((nside - x) + (nside - y)));
     }
 
-    if (phi_t < Math.PI/4) {
+    if (phi_t < Math.PI / 4) {
       z = 1 - Math.pow(Math.PI * (nside - x) / ((2 * phi_t - Math.PI) * nside), 2) / 3;
     } else {
       z = 1 - Math.pow(Math.PI * (nside - y) / (2 * phi_t * nside), 2) / 3;
@@ -145,25 +146,24 @@ function xy2xyz(xy, nside, dx, dy) {
     assert(0 <= Math.abs(z) && Math.abs(z) <= 1);
 
     if (hp >= 8) {
-      phi = Math.PI/2 * (hp-8) + phi_t;
-    }
-    else {
-      phi = Math.PI/2 * hp + phi_t;
+      phi = Math.PI / 2 * (hp - 8) + phi_t;
+    } else {
+      phi = Math.PI / 2 * hp + phi_t;
     }
   }
 
   if (phi < 0) {
-    phi += 2*Math.PI;
+    phi += 2 * Math.PI;
   }
 
-  var r = Math.sqrt(1 - z*z);
+  var r = Math.sqrt(1 - z * z);
 
   return {
     x: r * Math.cos(phi),
     y: r * Math.sin(phi),
     z: z
   };
-}  
+}
 
 function xyz2xy(xyz, nside) {
   var hp, x, y, dx, dy;
@@ -174,17 +174,17 @@ function xyz2xy(xyz, nside) {
   var phi = Math.atan2(xyz.y, xyz.x);
 
   if (phi < 0) {
-    phi += 2*Math.PI;
+    phi += 2 * Math.PI;
   }
 
-  var phi_t = phi % (0.5*Math.PI);
+  var phi_t = phi % (0.5 * Math.PI);
 
   assert(phi_t >= 0);
 
-  if ((xyz.z >= 2/3) || (xyz.z <= -2/3)) {
+  if ((xyz.z >= 2 / 3) || (xyz.z <= -2 / 3)) {
     var north, zfactor;
 
-    if (xyz.z >= 2/3) {
+    if (xyz.z >= 2 / 3) {
       north = true;
       zfactor = 1;
     } else {
@@ -192,8 +192,8 @@ function xyz2xy(xyz, nside) {
       zfactor = -1;
     }
 
-    var kx = rsqrt((1 - xyz.z*zfactor) * 3 * Math.pow(nside * (2 * phi_t - Math.PI) / Math.PI, 2)),
-        ky = rsqrt((1 - xyz.z*zfactor) * 3 * Math.pow(nside * 2 * phi_t / Math.PI, 2));
+    var kx = rsqrt((1 - xyz.z * zfactor) * 3 * Math.pow(nside * (2 * phi_t - Math.PI) / Math.PI, 2)),
+        ky = rsqrt((1 - xyz.z * zfactor) * 3 * Math.pow(nside * 2 * phi_t / Math.PI, 2));
 
     if (north) {
       xx = nside - kx;
@@ -203,8 +203,8 @@ function xyz2xy(xyz, nside) {
       yy = kx;
     }
 
-    x = Math.min(nside-1, Math.floor(xx));  
-    y = Math.min(nside-1, Math.floor(yy));
+    x = Math.min(nside - 1, Math.floor(xx));
+    y = Math.min(nside - 1, Math.floor(yy));
 
     assert(x >= 0);
     assert(x < nside);
@@ -214,7 +214,7 @@ function xyz2xy(xyz, nside) {
     dx = xx - x;
     dy = yy - y;
 
-    var sector = (phi - phi_t) / (0.5*Math.PI),
+    var sector = (phi - phi_t) / (0.5 * Math.PI),
         offset = Math.round(sector);
 
     assert(Math.abs(sector - offset) < eps);
@@ -226,14 +226,13 @@ function xyz2xy(xyz, nside) {
 
     if (north) {
       hp = offset;
-    }
-    else {
+    } else {
       hp = 8 + offset;
     }
 
   } else {
-    var zunits = (xyz.z + 2/3) / (4/3),
-        phiunits = phi_t / (0.5*Math.PI);
+    var zunits = (xyz.z + 2 / 3) / (4 / 3),
+        phiunits = phi_t / (0.5 * Math.PI);
 
     var u1 = zunits + phiunits,
         u2 = zunits - phiunits + 1;
@@ -246,7 +245,7 @@ function xyz2xy(xyz, nside) {
     xx = u1 * nside;
     yy = u2 * nside;
 
-    var sector = (phi - phi_t) / (0.5*Math.PI),
+    var sector = (phi - phi_t) / (0.5 * Math.PI),
         offset = Math.round(sector);
 
     assert(Math.abs(sector - offset) < eps);
@@ -274,12 +273,12 @@ function xyz2xy(xyz, nside) {
     }
 
     assert(xx >= -eps);
-    assert(xx < (nside+eps));
+    assert(xx < (nside + eps));
     assert(yy >= -eps);
-    assert(yy < (nside+eps));      
+    assert(yy < (nside + eps));
 
-    x = Math.max(0, Math.min(nside-1, Math.floor(xx)));
-    y = Math.max(0, Math.min(nside-1, Math.floor(yy)));
+    x = Math.max(0, Math.min(nside - 1, Math.floor(xx)));
+    y = Math.max(0, Math.min(nside - 1, Math.floor(yy)));
 
     assert(x >= 0);
     assert(x < nside);
@@ -303,7 +302,7 @@ function xyz2lon(xyz) {
   var lon = Math.atan2(xyz.y, xyz.x);
 
   if (lon < 0) {
-    lon += 2*Math.PI;
+    lon += 2 * Math.PI;
   }
 
   return lon;
@@ -343,7 +342,7 @@ function ang2xyz(ang) {
 export function boundary(XY, nside, n) {
   n = typeof n !== "undefined" ? n : 10;
 
-  var edge = range(0, 1+1/n, 1/n);
+  var edge = range(0, 1 + 1 / n, 1 / n);
 
   var outline = []
     .concat(edge.map(function(dy) { return XY2ang(XY, nside, 0, dy); }))

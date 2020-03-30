@@ -6,10 +6,10 @@ const d3 = Object.assign({},
   require("d3-ease"),
   require("d3-interpolate"));
 
-import {clamp} from "../tools/Math";
+import { clamp } from "../tools/Math";
 
 import React from "react";
-import {Form, Row, Col, Button} from "react-bootstrap";
+import { Form, Row, Col, Button } from "react-bootstrap";
 
 import "./styles.css";
 
@@ -17,7 +17,8 @@ export const id = "refrac";
 export const name = "Refraction of Light";
 export const readme = "This interactive visualization demonstrates the reflection and refraction of a light beam at the interface of a medium, as described by Snell's law and Fresnel's equations. Depending on the value of the refractive index and the polarization, the incoming beam can be fully reflected or fully refracted.";
 export const sources = [
-  {url: "https://en.wikipedia.org/wiki/Refraction", description: ["Refraction", "(Wikipedia)"]}];
+  { url: "https://en.wikipedia.org/wiki/Refraction", description: ["Refraction", "(Wikipedia)"] }
+];
 
 export function controls() {
   return (
@@ -52,24 +53,23 @@ export function controls() {
 }
 
 export function create(el, props) {
-  var margin = {top: 20, right: 10, bottom: 20, left: 10};
+  var margin = { top: 20, right: 10, bottom: 20, left: 10 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+  var svg = d3.select(el).append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
   var line = d3.line();
 
   var state = {
     _n: 1.5, // refractive index
-    _a: Math.PI/8, // angle of incidence
+    _a: Math.PI / 8, // angle of incidence
     _pol: "s", // polarization (s: perpendicular, p: parallel)
     get n() {
       return this._n;
@@ -99,36 +99,38 @@ export function create(el, props) {
       return Math.atan(this.n);
     },
     update: function() {
-      this.b = Math.asin(Math.sin(this.a)/this.n);
+      this.b = Math.asin(Math.sin(this.a) / this.n);
 
       // Snell's Law
       this.deflection = {
         t: this.a - this.b,
-        r: Math.PI + 2*this.a
+        r: Math.PI + 2 * this.a
       };
 
       // Fresnel's Equations
-      this.intensity =  {
+      this.intensity = {
         s: {
-          t: Math.pow((2*Math.cos(this.a))/(Math.cos(this.a) + this.n*Math.cos(this.b)), 2),
-          r: Math.pow((Math.cos(this.a)-this.n*Math.cos(this.b))/(Math.cos(this.a) + this.n*Math.cos(this.b)), 2)},
+          t: Math.pow((2 * Math.cos(this.a)) / (Math.cos(this.a) + this.n * Math.cos(this.b)), 2),
+          r: Math.pow((Math.cos(this.a) - this.n * Math.cos(this.b)) / (Math.cos(this.a) + this.n * Math.cos(this.b)), 2)
+        },
         p: {
-          t: Math.pow((2*Math.cos(this.a))/(Math.cos(this.b) + this.n*Math.cos(this.a)), 2),
-          r: Math.pow((this.n*Math.cos(this.a)-Math.cos(this.b))/(Math.cos(this.b) + this.n*Math.cos(this.a)), 2)}
+          t: Math.pow((2 * Math.cos(this.a)) / (Math.cos(this.b) + this.n * Math.cos(this.a)), 2),
+          r: Math.pow((this.n * Math.cos(this.a) - Math.cos(this.b)) / (Math.cos(this.b) + this.n * Math.cos(this.a)), 2)
+        }
       };
     }
   };
 
   state.update(); // set up defaults
 
-  var radius = width/2,
-      origin = [0, height/2],
+  var radius = width / 2,
+      origin = [0, height / 2],
       pivot = [origin[0] + radius, origin[1]];
 
   svg.selectAll(".ray")
     .data([[origin], [pivot], [pivot]])
-    .enter().append("path")
-      .attr("class", (d, i) => `ray ray${i}`);
+  .enter().append("path")
+    .attr("class", (d, i) => `ray ray${i}`);
 
   svg.append("path")
     .attr("class", "surface");
@@ -146,24 +148,26 @@ export function create(el, props) {
     if (state.n < 1 && Math.abs(state.a) >= state.aT) {
       state.intensity[state.pol].r = 1; // could be Nan
       svg.select(".ray1").datum([pivot]);
-    }
-    else {
+    } else {
       svg.select(".ray1").datum([pivot, [
         pivot[0] + radius * Math.cos(state.deflection.t),
-        pivot[1] + radius * Math.sin(state.deflection.t)]]);
+        pivot[1] + radius * Math.sin(state.deflection.t)
+      ]]);
     }
 
     // reflected ray
     svg.select(".ray2").datum([pivot, [
       pivot[0] + radius * Math.cos(state.deflection.r),
-      pivot[1] + radius * Math.sin(state.deflection.r)]]);
+      pivot[1] + radius * Math.sin(state.deflection.r)
+    ]]);
   }
 
   function updateChart() {
     svg.select(".surface")
       .attr("d", line([
         [radius * Math.sin(state.a) + pivot[0], -radius * Math.cos(state.a) + pivot[1]],
-        [-radius * Math.sin(state.a) + pivot[0], radius * Math.cos(state.a) + pivot[1]]]));
+        [-radius * Math.sin(state.a) + pivot[0], radius * Math.cos(state.a) + pivot[1]]
+      ]));
 
     // input ray
     svg.select(".ray0")
@@ -195,14 +199,14 @@ export function create(el, props) {
   d3.select("#control-refrac-total")
     .on("click", function() {
       svg.transition()
-        .duration(dt/8)
+        .duration(dt / 8)
         .tween("rotate", rotateTween(state.aT));
     });
 
   d3.select("#control-refrac-zero")
     .on("click", function() {
       svg.transition()
-        .duration(dt/8)
+        .duration(dt / 8)
         .tween("rotate", rotateTween(state.aB));
     });
 
@@ -217,8 +221,7 @@ export function create(el, props) {
   d3.selectAll(".control-refrac-pol")
     .select("input")
     .on("change", function() {
-      if (this.value == "s") state.pol = "s";
-      if (this.value == "p") state.pol = "p";
+      state.pol = this.value;
       updateAll();
     });
 
@@ -226,37 +229,41 @@ export function create(el, props) {
   var dt = 3000;
 
   svg.select(".ray0")
-    .transition().duration(dt/4).ease(d3.easeLinear)
-      .attrTween("d", pathTween(line, radius))
-      .on("start", function() {
-        updateChart();
-        updateData();
-        d3.selectAll(".control")
-          .attr("disabled", true);
-      })
-      .on("end", function() {
-        var t = d3.transition().duration(dt/4).ease(d3.easeLinear);
-        svg.select(".ray1")
-          .transition(t)
-          .attrTween("d", pathTween(line, radius));
-        svg.select(".ray2")
-          .transition(t)
-          .attrTween("d", pathTween(line, radius));
-      });
+    .transition().duration(dt / 4).ease(d3.easeLinear)
+    .attrTween("d", pathTween(line, radius))
+    .on("start", function() {
+      updateChart();
+      updateData();
+
+      d3.selectAll(".control")
+        .attr("disabled", true);
+    })
+    .on("end", function() {
+      var t = d3.transition().duration(dt / 4).ease(d3.easeLinear);
+
+      svg.select(".ray1")
+        .transition(t)
+        .attrTween("d", pathTween(line, radius));
+
+      svg.select(".ray2")
+        .transition(t)
+        .attrTween("d", pathTween(line, radius));
+    });
 
   svg.transition()
-    .delay(dt/2)
-    .duration(dt/2)
-    .tween("rotate", rotateTween(Math.PI/4))
+    .delay(dt / 2)
+    .duration(dt / 2)
+    .tween("rotate", rotateTween(Math.PI / 4))
     .on("end", function() {
       d3.selectAll(".control")
         .attr("disabled", null);
+        
       updateChart();
 
       svg.select(".surface")
         .call(d3.drag().on("drag", function() {
           var mouse = d3.mouse(this);
-          state.a = clamp(Math.atan(-(mouse[0]-pivot[0])/(mouse[1]-pivot[1])), -0.9*Math.PI/2, 0.9*Math.PI/2);
+          state.a = clamp(Math.atan(-(mouse[0] - pivot[0]) / (mouse[1] - pivot[1])), -0.9 * Math.PI / 2, 0.9 * Math.PI / 2);
           updateAll();
         }));
     });
@@ -269,8 +276,13 @@ export function create(el, props) {
           n0 = path0.getTotalLength(),
           n1 = (path1.setAttribute("d", d1), path1).getTotalLength();
 
-      var distances = [0], i = 0, dt = precision/Math.max(n0, n1);
-      while ((i += dt) < 1) distances.push(i);
+      var distances = [0],
+          t = 0,
+          dt = precision / Math.max(n0, n1);
+
+      while ((t += dt) < 1)
+          distances.push(t);
+
       distances.push(1);
 
       var points = distances.map(t => {

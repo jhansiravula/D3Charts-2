@@ -1,9 +1,9 @@
 // nested sampling routines based on nestle (https://github.com/kbarbary/nestle/)
 
 import numeric from "numeric";
-import {randomNormal} from "d3-random";
-import {interval} from "d3-timer";
-import {mod} from "./Math";
+import { randomNormal } from "d3-random";
+import { interval } from "d3-timer";
+import { mod } from "./Math";
 
 var Nest = {};
 
@@ -25,24 +25,36 @@ Nest.sample = function(loglikelihood, prior_transform, ndim, npoints, method, up
   // dlogz: iteration will stop when the estimated contribution of the remaining prior volume to the total evidence is small
   // decline_factor: iteration will stop when the weight of newly saved samples has been has been declining for a while
 
-  if (typeof npdim === "undefined") npdim = ndim;
+  if (typeof npdim === "undefined")
+    npdim = ndim;
 
-  if (typeof maxiter === "undefined") maxiter = 1e6;
-  if (typeof maxcall === "undefined") maxcall = 1e9;
+  if (typeof maxiter === "undefined")
+    maxiter = 1e6;
 
-  if (typeof method === "undefined") method = "single";
+  if (typeof maxcall === "undefined")
+    maxcall = 1e9;
 
-  if (!(method in SAMPLERS)) console.error("unknown method");
-  if (npoints < 2 * ndim) console.warn("npoints < 2 * ndim");
+  if (typeof method === "undefined")
+    method = "single";
 
-  if ((typeof dlogz !== "undefined") && (typeof decline_factor !== "undefined")) console.error("cannot specify two separate stopping criteria: decline_factor and dlogz");
-  else if ((typeof dlogz === "undefined") && (typeof decline_factor === "undefined")) dlogz = 0.5;
+  if (!(method in SAMPLERS))
+    console.error("unknown method");
+
+  if (npoints < 2 * ndim)
+    console.warn("npoints < 2 * ndim");
+
+  if ((typeof dlogz !== "undefined") && (typeof decline_factor !== "undefined"))
+    console.error("cannot specify two separate stopping criteria: decline_factor and dlogz");
+
+  else if ((typeof dlogz === "undefined") && (typeof decline_factor === "undefined"))
+    dlogz = 0.5;
 
   if (typeof update_interval === "undefined") {
     update_interval = Math.max(1, Math.round(0.6 * npoints));
   } else {
     update_interval = Math.round(update_interval);
-    if (update_interval < 1) console.error("update_interval must be >= 1")
+    if (update_interval < 1)
+      console.error("update_interval must be >= 1")
   }
 
   // initialize active points and calculate likelihoods
@@ -65,7 +77,7 @@ Nest.sample = function(loglikelihood, prior_transform, ndim, npoints, method, up
 
   var h = 0, // information
       logz = -1e300, // log(evidence)
-      logvol = Math.log(1 - Math.exp(-1/npoints)); // first point removed will have volume 1-e^(1/n)
+      logvol = Math.log(1 - Math.exp(-1 / npoints)); // first point removed will have volume 1-e^(1/n)
 
   var ncall = npoints; // number of calls we already made
 
@@ -83,44 +95,44 @@ Nest.sample = function(loglikelihood, prior_transform, ndim, npoints, method, up
   var iteration = $.Deferred();
 
   var timer = interval(function() {
-    
+
     // worst object in collection and its weight
     var worst = numeric.arginf(active_logl),
         logwt = logvol + active_logl[worst];
-  
+
     // update evidence Z and information h
     var logz_new = logaddexp(logz, logwt);
     h = (Math.exp(logwt - logz_new) * active_logl[worst] + Math.exp(logz - logz_new) * (h + logz) - logz_new);
     logz = logz_new;
-  
+
     // add worst object to samples
     saved_v.push(active_v[worst]);
     saved_logwt.push(logwt);
     saved_logvol.push(logvol);
     saved_logl.push(active_logl[worst]);
-  
+
     // the new likelihood constraint is that of the worst object
     var loglstar = active_logl[worst];
-  
+
     var expected_vol = Math.exp(-iter / npoints),
         pointvol = expected_vol / npoints;
-  
+
     // update the sampler based on the current active points
     if (since_update >= update_interval) {
       sampler.update(pointvol);
       since_update = 0;
     }
-  
+
     // choose a new point from within the likelihood constraint
     var new_point = sampler.new_point(loglstar);
-  
+
     // replace worst point with new point
     active_u[worst] = new_point.u;
     active_v[worst] = new_point.v;
     active_logl[worst] = new_point.logl;
     ncall += new_point.ncall;
     since_update += new_point.ncall;
-  
+
     // shrink interval
     logvol -= 1 / npoints;
 
@@ -138,20 +150,22 @@ Nest.sample = function(loglikelihood, prior_transform, ndim, npoints, method, up
     // stopping criterion 1: estimated fractional remaining evidence below some threshold
     if (typeof dlogz !== "undefined") {
       var logz_remain = Math.max.apply(null, active_logl) - iter / npoints;
-      if (logaddexp(logz, logz_remain) - logz < dlogz) iteration.resolve(result);
+      if (logaddexp(logz, logz_remain) - logz < dlogz)
+        iteration.resolve(result);
     }
-  
+
     // stopping criterion 2: logwt has been declining for a while
     if (typeof decline_factor !== "undefined") {
       ndecl = logwt < logwt_old ? ndecl + 1 : 0;
       logwt_old = logwt;
-      if (ndecl < decline_factor * npoints) iteration.resolve(result);
+      if (ndecl < decline_factor * npoints)
+        iteration.resolve(result);
     }
 
     // stopping criterion 3: exceeded maximum number of calls or iterations
     if (ncall >= maxcall) iteration.resolve(result);
     if (iter >= maxiter) iteration.resolve(result);
-  
+
     iter += 1;
   }, Nest.delay);
 
@@ -162,20 +176,22 @@ Nest.sample = function(loglikelihood, prior_transform, ndim, npoints, method, up
       // add remaining active points
       var logvol = -saved_v.length / npoints - Math.log(npoints);
       for (var i = 0; i < npoints; i++) {
-          var logwt = logvol + active_logl[i];
-          var logz_new = logaddexp(logz, logwt);
-          h = (Math.exp(logwt - logz_new) * active_logl[i] + Math.exp(logz - logz_new) * (h + logz) - logz_new);
-          logz = logz_new;
-          saved_v.push(active_v[i]);
-          saved_logwt.push(logwt);
-          saved_logl.push(active_logl[i]);
-          saved_logvol.push(logvol);
+        var logwt = logvol + active_logl[i];
+        var logz_new = logaddexp(logz, logwt);
+        h = (Math.exp(logwt - logz_new) * active_logl[i] + Math.exp(logz - logz_new) * (h + logz) - logz_new);
+        logz = logz_new;
+        saved_v.push(active_v[i]);
+        saved_logwt.push(logwt);
+        saved_logl.push(active_logl[i]);
+        saved_logvol.push(logvol);
       }
-    
+
       // h should always be nonnegative
       if (h < 0) {
-        if (h > -SQRTEPS) h = 0;
-        else console.error("negative h encountered");
+        if (h > -SQRTEPS)
+          h = 0;
+        else
+          console.error("negative h encountered");
       }
 
       result.niter = iter;
@@ -198,7 +214,7 @@ Nest.sample = function(loglikelihood, prior_transform, ndim, npoints, method, up
 };
 
 function SingleEllipsoidSampler(loglikelihood, prior_transform, points) {
-// bound active points in a single ellipsoid and sample randomly from within this ellipsoid
+  // bound active points in a single ellipsoid and sample randomly from within this ellipsoid
 
   this.loglikelihood = loglikelihood;
   this.prior_transform = prior_transform;
@@ -208,32 +224,33 @@ function SingleEllipsoidSampler(loglikelihood, prior_transform, points) {
 }
 
 SingleEllipsoidSampler.prototype.update = function(pointvol) {
-// calculate the bounding ellipsoid
+  // calculate the bounding ellipsoid
 
   this.ell = bounding_ellipsoid(this.points, pointvol);
   this.ell.scale_to_vol(this.ell.vol * this.enlarge);
 };
 
 SingleEllipsoidSampler.prototype.new_point = function(loglstar) {
-// draw a new point from within the likelihood constraint
+  // draw a new point from within the likelihood constraint
 
   var ncall = 0;
   var logl = -Infinity
   while (logl < loglstar) {
     while (true) {
       var u = this.ell.sample();
-      if (u.every(ui => ui > 0 && ui < 1)) break;
+      if (u.every(ui => ui > 0 && ui < 1))
+        break;
     }
     var v = this.prior_transform(u);
     logl = this.loglikelihood(v);
     ncall += 1;
   }
 
-  return {u: u, v: v, logl: logl, ncall: ncall};
+  return { u: u, v: v, logl: logl, ncall: ncall };
 };
 
 function Ellipsoid(ctr, a) {
-// n-dimensional ellipsoid
+  // n-dimensional ellipsoid
 
   this.n = ctr.length;
   this.ctr = ctr; // center coordinates
@@ -248,9 +265,9 @@ function Ellipsoid(ctr, a) {
 }
 
 Ellipsoid.prototype.scale_to_vol = function(vol) {
-// rescale the ellipsoid to satisfy a target volume
+  // rescale the ellipsoid to satisfy a target volume
 
-  var f = Math.pow(vol / this.vol, 1./this.n);
+  var f = Math.pow(vol / this.vol, 1. / this.n);
   this.a = numeric.mul(Math.pow(f, -2), this.a);
   this.axlens = numeric.mul(f, this.axlens);
   this.axes = numeric.mul(f, this.axes);
@@ -258,36 +275,38 @@ Ellipsoid.prototype.scale_to_vol = function(vol) {
 };
 
 Ellipsoid.prototype.contains = function(x) {
-// check if a point is contained in the ellipsoid
+  // check if a point is contained in the ellipsoid
 
   var delta = numeric.sub(x, this.ctr);
   return numeric.dot(numeric.dot(delta, this.a), delta) <= 1.0;
 };
 
 Ellipsoid.prototype.randoffset = function() {
-// randomly distributed offset from ellipsoid center
+  // randomly distributed offset from ellipsoid center
 
   return numeric.dot(this.axes, randsphere(this.n));
 };
 
 Ellipsoid.prototype.sample = function() {
-// draw a sample randomly distributed within the ellipsoid
+  // draw a sample randomly distributed within the ellipsoid
 
   return numeric.add(this.ctr, this.randoffset())
 };
 
 function bounding_ellipsoid(x, pointvol) {
-// bounding ellipsoid for a set of points
+  // bounding ellipsoid for a set of points
 
-  if (typeof pointvol === "undefined") pointvol = 0;
+  if (typeof pointvol === "undefined")
+    pointvol = 0;
 
   var dims = numeric.dim(x),
-      npoints = dims[0], ndim = dims[1];
+      npoints = dims[0],
+      ndim = dims[1];
 
   // special case of a single point
   if (npoints === 1) {
-    var r = Math.pow(pointvol / vol_prefactor(ndim), 1/ndim)
-    return new Ellipsoid(x[0], numeric.mul(1 / Math.pow(r, 2), numeric.identity(ndim)))
+    var r = Math.pow(pointvol / vol_prefactor(ndim), 1 / ndim);
+    return new Ellipsoid(x[0], numeric.mul(1 / Math.pow(r, 2), numeric.identity(ndim)));
   }
 
   // calculate covariance of the points
@@ -307,7 +326,7 @@ function bounding_ellipsoid(x, pointvol) {
   var fmax = -Infinity;
   for (var i = 0; i < npoints; i++) {
     var f = numeric.dot(delta[i], numeric.dot(a, delta[i]));
-    fmax = Math.max(fmax, f)
+    fmax = Math.max(fmax, f);
   }
 
   // ensure that all points are definitely bounded
@@ -323,40 +342,44 @@ function bounding_ellipsoid(x, pointvol) {
 }
 
 function vol_prefactor(n) {
-// volume constant for an n-dimensional sphere
+  // volume constant for an n-dimensional sphere
 
   if (mod(n, 2) == 0) {
     var f = 1;
-    for (var i = 2; i <= n; i += 2) f *= (2 * Math.PI / i);
+    for (var i = 2; i <= n; i += 2)
+      f *= (2 * Math.PI / i);
   } else {
     var f = 2;
-    for (var i = 3; i <= n; i += 2) f *= (2 * Math.PI / i);
+    for (var i = 3; i <= n; i += 2)
+      f *= (2 * Math.PI / i);
   }
 
   return f;
 }
 
 function randsphere(n) {
-// draw a random point within an n-dimensional unit sphere
+  // draw a random point within an n-dimensional unit sphere
 
   var z = numeric._random([n], 0, randomNormal());
-  return numeric.mul(z, Math.pow(Math.random(), 1./n) / Math.sqrt(numeric.sum(numeric.pow(z, 2))))
+  return numeric.mul(z, Math.pow(Math.random(), 1. / n) / Math.sqrt(numeric.sum(numeric.pow(z, 2))))
 }
 
 function covariance_matrix(x, ddof) {
-// estimate the covariance of a set of data points
+  // estimate the covariance of a set of data points
 
-  if (typeof ddof === "undefined") ddof = 1;
+  if (typeof ddof === "undefined")
+    ddof = 1;
 
   var dims = numeric.dim(x);
-  if (dims.length === 1) x = numeric.reshape(x, [dims[0], 1]); // need at least a 2-d array
+  if (dims.length === 1)
+    x = numeric.reshape(x, [dims[0], 1]); // need at least a 2-d array
   x = numeric.sub(x, numeric.mean(x, 0));
 
-  return numeric.mul(1/(dims[0] - ddof), numeric.dot(numeric.transpose(x), x))
+  return numeric.mul(1 / (dims[0] - ddof), numeric.dot(numeric.transpose(x), x))
 }
 
 function logaddexp(x, y) {
-// logarithm of the sum of exponentiations of the inputs
+  // logarithm of the sum of exponentiations of the inputs
 
   if (x === y) {
     return x + Math.log(2);
@@ -373,22 +396,25 @@ function logaddexp(x, y) {
 }
 
 Nest.resample_equal = function(samples, weights) {
-// resample the samples to have equal weight
+  // resample the samples to have equal weight
 
   var n = weights.length;
 
   var positions = [],
-      sum = 0, cumulative_sum = [];
+      sum = 0,
+      cumulative_sum = [];
 
   for (var i = 0; i < n; i++) {
     positions.push((Math.random() + i) / n);
     cumulative_sum.push(sum += weights[i]);
   }
 
-  if (sum - 1 > SQRTEPS) console.error("weights do not sum to 1");
+  if (sum - 1 > SQRTEPS)
+    console.error("weights do not sum to 1");
 
   var index = numeric.zeros([n]),
-      i = 0, j = 0;
+      i = 0,
+      j = 0;
 
   while (i < n) {
     if (positions[i] < cumulative_sum[j]) {

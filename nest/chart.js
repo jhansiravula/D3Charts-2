@@ -7,15 +7,16 @@ import numeric from "numeric";
 import Nest from "../tools/Nest";
 
 import React from "react";
-import {Form, Button, ButtonGroup} from "react-bootstrap";
+import { Form, Button, ButtonGroup } from "react-bootstrap";
 
 export const id = "nest";
 export const name = "Nested Sampling: Eggbox Example";
 export const readme = "The nested sampling algorithm is very efficient in exploring this highly multimodal, twodimensional likelihood function, which is shaped like an eggbox (assuming a uniform prior for \\(x\\) and \\(y\\) over the interval \\([-5\\pi,5\\pi]\\)): \\[\\mathcal{L}(x,y)=\\left[2+\\cos\\left(\\frac{x}{2}\\right)\\cdot\\cos\\left(\\frac{y}{2}\\right)\\right]^5\\] It also calculates the Bayesian evidence accurately, in this case \\(\\log(\\mathcal{Z})\\approx 235.856\\). The (unweighted) samples are shown in blue, while the currently active points are shown in red.";
 export const sources = [
-  {url: "https://en.wikipedia.org/wiki/Nested_sampling_algorithm", description: ["Nested Sampling Algorithm", "(Wikipedia)"]},
-  {url: "https://doi.org/10.1063/1.1835238", description: "Skilling+ 2014"},
-  {url: "https://github.com/kbarbary/nestle", description: ["nestle.py", "(K. Barbary)"]}];
+  { url: "https://en.wikipedia.org/wiki/Nested_sampling_algorithm", description: ["Nested Sampling Algorithm", "(Wikipedia)"] },
+  { url: "https://doi.org/10.1063/1.1835238", description: "Skilling+ 2014" },
+  { url: "https://github.com/kbarbary/nestle", description: ["nestle.py", "(K. Barbary)"] }
+];
 
 var sampling;
 
@@ -29,28 +30,27 @@ export function controls() {
         </ButtonGroup>
       </Form.Group>
     </Form>
-    );
+  );
 }
 
 export function create(el, props) {
   Nest.delay = 50;
 
-  var margin = {top: 20, right: 10, bottom: 20, left: 10};
+  var margin = { top: 20, right: 10, bottom: 20, left: 10 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
   var size = height;
 
-  var svg = d3.select(el)
-    .append("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`)
-    .append("g")
-      .attr("transform", `translate(${(width - size)/2},0)`);
+  var svg = d3.select(el).append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
+  .append("g")
+    .attr("transform", `translate(${(width - size)/2},0)`);
 
   svg.append("rect")
     .attr("width", size)
@@ -59,7 +59,7 @@ export function create(el, props) {
     .style("stroke", "black");
 
   svg.append("g")
-    .attr("class", "samples"),
+    .attr("class", "samples");
 
   svg.append("g")
     .attr("class", "points");
@@ -80,28 +80,30 @@ export function create(el, props) {
     svg.select(".info")
       .text(`log(Z) = ${d3.format(".1f")(result.logz)}`);
 
-    var sample = svg.select(".samples").selectAll(".sample").data(result.samples);
+    var sample = svg.select(".samples").selectAll(".sample")
+      .data(result.samples);
 
     sample.enter().append("circle")
-        .attr("class", "sample")
-      .merge(sample)
-        .attr("cx", d => scale(d[0]))
-        .attr("cy", d => scale(d[1]))
-        .attr("r", 3)
-        .style("fill", color("sample"));
+      .attr("class", "sample")
+    .merge(sample)
+      .attr("cx", d => scale(d[0]))
+      .attr("cy", d => scale(d[1]))
+      .attr("r", 3)
+      .style("fill", color("sample"));
 
-    var point = svg.select(".points").selectAll(".point").data(result.active_points);
+    var point = svg.select(".points").selectAll(".point")
+      .data(result.active_points);
 
     point.enter().append("circle")
-        .attr("class", "point")
-      .merge(point)
-        .attr("cx", d => scale(d[0]))
-        .attr("cy", d => scale(d[1]))
-        .attr("r", 3)
-        .style("fill", color("point"));
+      .attr("class", "point")
+    .merge(point)
+      .attr("cx", d => scale(d[0]))
+      .attr("cy", d => scale(d[1]))
+      .attr("r", 3)
+      .style("fill", color("point"));
   }
 
-  var tmax = 5*Math.PI;
+  var tmax = 5 * Math.PI;
 
   function prior_transform(u) {
     var v = numeric.clone(u);
