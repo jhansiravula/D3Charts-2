@@ -1,4 +1,4 @@
-var d3 = Object.assign({},
+const d3 = Object.assign({},
   require("d3-selection"),
   require("d3-shape"),
   require("d3-drag"),
