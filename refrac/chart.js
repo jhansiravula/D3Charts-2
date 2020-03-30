@@ -13,7 +13,7 @@ import {Form, Row, Col, Button} from "react-bootstrap";
 
 import "./styles.css";
 
-export const id = "chart-refrac";
+export const id = "refrac";
 export const name = "Refraction of Light";
 export const readme = "This interactive visualization demonstrates the reflection and refraction of a light beam at the interface of a medium, as described by Snell's law and Fresnel's equations. Depending on the value of the refractive index and the polarization, the incoming beam can be fully reflected or fully refracted.";
 export const sources = [

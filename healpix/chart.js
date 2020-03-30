@@ -13,7 +13,7 @@ import * as HealPix from "../tools/HealPix";
 
 import dataSrc from "./data.csv";
 
-export const id = "chart-healpix";
+export const id = "healpix";
 export const name = "HealPix";
 export const readme = "Example of a HealPix grid, mapped using different projections.";
 export const sources = [

@@ -12,7 +12,7 @@ import Nest from "../tools/Nest";
 import React from "react";
 import {Button, ButtonGroup, Form, Row, Col} from "react-bootstrap";
 
-export const id = "chart-lines";
+export const id = "lines";
 export const name = "Nested Sampling: Model Selection";
 export const readme = "The nested sampling algorithm can be used to calculate the Bayesian evidence, which is helpful for model selection. In this example, it is tested whether data of a spectral line favors a model including a broad component \\((K>10)\\), or not.";
 export const sources = [

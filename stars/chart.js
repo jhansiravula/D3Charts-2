@@ -10,7 +10,7 @@ import versor from "versor";
 
 import dataSrc from "./data.csv";
 
-export const id = "chart-stars";
+export const id = "stars";
 export const name = "Star Chart";
 export const readme = "An interactive star chart created for a tutorial session at .Astronomy 8.";
 export const sources = [

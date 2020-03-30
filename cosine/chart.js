@@ -8,7 +8,7 @@ const d3 = Object.assign({},
 
 import "./styles.css";
 
-export const id = "chart-cosine";
+export const id = "cosine";
 export const name = "The Cosine Curve";
 export const readme = "This animation demonstrates the relationship of \\(\\cos(x)\\) to the circle.";
 export const sources = [

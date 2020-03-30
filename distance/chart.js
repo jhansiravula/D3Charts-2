@@ -12,7 +12,7 @@ import {Form, Row, Col} from "react-bootstrap";
 import "./styles.css";
 import dataSrc from "./data.json";
 
-export const id = "chart-distance";
+export const id = "distance";
 export const name = "The Distance to the Galactic Center";
 export const readme = "This chart shows a compilation of recent measurements of the distance to the Galactic Center, based on different methods.";
 export const sources = [

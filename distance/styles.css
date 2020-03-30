@@ -1,20 +1,35 @@
-.chart-distance .point path { opacity: 0; }  
-.chart-distance .point circle { fill: #1f78b4; }
-.chart-distance .point line { stroke: #1f78b4; stroke-width: 2.5px; }
+.distance .point path {
+  opacity: 0;
+}
+.distance .point circle {
+  fill: #1f78b4;
+}
+.distance .point line {
+  stroke: #1f78b4;
+  stroke-width: 2.5px;
+}
 
-.chart-distance .point:not(.selected) circle { fill: #cccccc; }
-.chart-distance .point:not(.selected) line { stroke: #cccccc; }  
+.distance .point:not(.selected) circle {
+  fill: #cccccc;
+}
+.distance .point:not(.selected) line {
+  stroke: #cccccc;
+}
 
-.chart-distance .point.hover circle { fill: #33a02c; }
-.chart-distance .point.hover line { stroke: #33a02c; }
+.distance .point.hover circle {
+  fill: #33a02c;
+}
+.distance .point.hover line {
+  stroke: #33a02c;
+}
 
-.chart-distance .average {
-    stroke: black;
-    stroke-width: 1px;
-    stroke-dasharray: 10px, 10px;
-  }
+.distance .average {
+  stroke: black;
+  stroke-width: 1px;
+  stroke-dasharray: 10px, 10px;
+}
 
-.chart-distance .reference {
-    font-weight: bold;
-    fill: #33a02c;
-  }
+.distance .reference {
+  font-weight: bold;
+  fill: #33a02c;
+}

@@ -15,7 +15,7 @@ import data_south_csv from "./data_south.csv"
 import React from "react";
 import {Form, Row, Col} from "react-bootstrap";
 
-export const id = "chart-seaice";
+export const id = "seaice";
 export const name = "Sea Ice Index";
 export const readme = "This chart shows the short- and long-term changes in the extent of Arctic and Antarctic sea ice.";
 export const sources = [

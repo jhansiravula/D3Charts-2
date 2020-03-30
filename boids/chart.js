@@ -12,7 +12,7 @@ import {Vec} from "../tools/Vector";
 import React from "react";
 import {Form, Row, Col} from "react-bootstrap";
 
-export const id = "chart-boids";
+export const id = "boids";
 export const name = "Boids";
 export const readme = "The Boids model can be used to simulate the flocking behavior of birds.";
 export const sources = [

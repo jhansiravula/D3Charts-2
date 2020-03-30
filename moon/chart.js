@@ -9,7 +9,7 @@ import versor from "versor";
 
 import dataSrc from "./data.csv";
 
-export const id = "chart-moon";
+export const id = "moon";
 export const name = "Lunar Craters";
 export const readme = "Shown on this moon globe are all large lunar craters (with diameters greater than 50 km).";
 export const sources = [

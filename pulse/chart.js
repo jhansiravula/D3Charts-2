@@ -9,7 +9,7 @@ const d3 = Object.assign({},
 import React from "react";
 import {Form, Row, Col} from "react-bootstrap";
 
-export const id = "chart-pulse";
+export const id = "pulse";
 export const name = "Wave Packets";
 export const readme = "This pulse is described by the following equation: \\[E(x,t)=\\frac{E_0}{\\sqrt{\\pi}\\tau}e^{-\\frac{(t-k'x)^2}{2\\tau^2}}e^{i\\omega_0t-ik_0x}\\] The phase propagates at velocity \\(v_{ph}=\\frac{\\omega_0}{k_0}\\) and the envelope at \\(v_{gr}=\\frac{1}{k'}\\).";
 export const sources = [

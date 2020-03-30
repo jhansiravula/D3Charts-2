@@ -1,10 +1,43 @@
-circle.healthy { fill: #1f77b4; }
-circle.infected { fill: none; stroke: #d62728; stroke-width: 2px; }
-circle.sick { fill: #d62728; stroke: #d62728; stroke-width: 2px; }
-circle.isolated { fill: #d62728; fill-opacity: 0.5; }
-circle.recovered { fill: #1f77b4; fill-opacity: 0.5; stroke: #1f77b4; stroke-width: 2px; }
-circle.dead { fill: #000; fill-opacity: 0.5; }
+circle.healthy {
+  fill: #1f77b4;
+}
+circle.infected {
+  fill: none;
+  stroke: #d62728;
+  stroke-width: 2px;
+}
+circle.sick {
+  fill: #d62728;
+  stroke: #d62728;
+  stroke-width: 2px;
+}
+circle.isolated {
+  fill: #d62728;
+  fill-opacity: 0.5;
+}
+circle.recovered {
+  fill: #1f77b4;
+  fill-opacity: 0.5;
+  stroke: #1f77b4;
+  stroke-width: 2px;
+}
+circle.dead {
+  fill: #000;
+  fill-opacity: 0.5;
+}
 
-path.healthy { fill: none; stroke: #1f77b4; stroke-width: 3px; }
-path.infected { fill: none; stroke: #d62728; stroke-width: 1px; }
-path.sick { fill: none; stroke: #d62728; stroke-width: 3px; }
+path.healthy {
+  fill: none;
+  stroke: #1f77b4;
+  stroke-width: 3px;
+}
+path.infected {
+  fill: none;
+  stroke: #d62728;
+  stroke-width: 1px;
+}
+path.sick {
+  fill: none;
+  stroke: #d62728;
+  stroke-width: 3px;
+}

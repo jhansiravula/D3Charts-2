@@ -1,17 +1,17 @@
-.chart-seaice .line {
+.seaice .line {
   fill: none;
   stroke: black;
   stroke-width: 1;
   stroke-opacity: 0.33;
 }
 
-.chart-seaice .line-2020 {
+.seaice .line-2020 {
   stroke: #d62728;
   stroke-width: 3;
   stroke-opacity: 1 !important;
-}      
+}
 
-.chart-seaice .active {
+.seaice .active {
   stroke-width: 4;
   stroke-opacity: 0.66;
 }

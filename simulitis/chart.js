@@ -14,7 +14,7 @@ import {Form, Container, Row, Col, Button} from "react-bootstrap";
 
 import "./styles.css";
 
-export const id = "chart-simulitis";
+export const id = "simulitis";
 export const name = "Simulitis";
 export const readme = "This simulation tracks the spread of a fictional desease by contact in a population of blue circles, a fraction of which are stationary, and the rest of which are moving. The red-color desease will spread quickly as soon as the three inially infected circles start to bump into others, thus transmitting the infection. Any infected circle that turns sick after the 'incubation time' is, by default, immediately isolated (excluded from the simulation) until it recovers its blue color after the 'recovery time', or dies. Note that a recovered circle can not be infected again, and that each simulation will yield a somewhat different result because the initial configuration of the circles is random.";
 export const sources = [

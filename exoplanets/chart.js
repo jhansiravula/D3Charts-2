@@ -10,7 +10,7 @@ import {Form, Row, Col} from "react-bootstrap";
 
 var url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?&table=exoplanets&select=pl_hostname,pl_orbsmax,pl_bmassj,pl_radj&where=pl_orbsmax%20is%20not%20null%20and%20pl_bmassj%20is%20not%20null%20and%20pl_radj%20is%20not%20null&format=csv";
 
-export const id = "chart-exoplanets";
+export const id = "exoplanets";
 export const name = "Exoplanets";
 export const readme = "This chart summarizes a few key properties of confirmed exoplanets in the NASA exoplanet archive.";
 export const sources = [

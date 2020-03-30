@@ -11,7 +11,7 @@ const d3 = Object.assign({},
 
 import dataSrc from "./data.csv"
 
-export const id = "chart-sunspots";
+export const id = "sunspots";
 export const name = "Sunspots";
 export const readme = "This butterfly diagram shows the latitude distribution of sunspot groups over several past solar cycles.";
 export const sources = [

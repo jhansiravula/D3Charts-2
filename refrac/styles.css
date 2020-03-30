@@ -1,9 +1,26 @@
-.chart-refrac .ray { fill: none; stroke-width: 7px; }
-.chart-refrac .ray0 { stroke: #d62728; }
-.chart-refrac .ray1 { stroke: #aec7e8; }
-.chart-refrac .ray2 { stroke: #d62728; }
+.refrac .ray {
+  fill: none;
+  stroke-width: 7px;
+}
+.refrac .ray0 {
+  stroke: #d62728;
+}
+.refrac .ray1 {
+  stroke: #aec7e8;
+}
+.refrac .ray2 {
+  stroke: #d62728;
+}
 
-.chart-refrac .surface { fill: none; stroke: #1f77b4; stroke-width: 10px; }
-.chart-refrac .surface:hover { cursor: pointer; }
+.refrac .surface {
+  fill: none;
+  stroke: #1f77b4;
+  stroke-width: 10px;
+}
+.refrac .surface:hover {
+  cursor: pointer;
+}
 
-.label { font-size: 120%; }
+.label {
+  font-size: 120%;
+}

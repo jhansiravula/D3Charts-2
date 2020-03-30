@@ -1,9 +1,27 @@
-.chart-clt .ball { fill: #d62728; stroke: #000; stroke-width: 1px; }
+.clt .ball {
+  fill: #d62728;
+  stroke: #000;
+  stroke-width: 1px;
+}
 
-.chart-clt .bar rect { fill: #1f77b4; fill-opacity: 0.8; }
-.chart-clt .bar text { fill: white; }
+.clt .bar rect {
+  fill: #1f77b4;
+  fill-opacity: 0.8;
+}
+.clt .bar text {
+  fill: white;
+}
 
-.chart-clt .line { fill: #636363; fill-opacity: 0.2; }
+.clt .line {
+  fill: #636363;
+  fill-opacity: 0.2;
+}
 
-.chart-clt .axis path { stroke: #636363; stroke-width: 2px; }
-.chart-clt .axis text { fill: #636363; stroke: none; }
+.clt .axis path {
+  stroke: #636363;
+  stroke-width: 2px;
+}
+.clt .axis text {
+  fill: #636363;
+  stroke: none;
+}

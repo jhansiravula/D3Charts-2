@@ -13,7 +13,7 @@ import {Form, Row, Col} from "react-bootstrap";
 
 import "./styles.css";
 
-export const id = "chart-clt";
+export const id = "clt";
 export const name = "The Central Limit Theorem";
 export const readme = "Let \\(x_1 \\dots x_n\\) be a set of independent, identically distributed random variables following a distribution \\(f\\) with mean \\(\\mu\\) and finite variance \\(\\sigma^2\\). In the limit of large \\(n\\), the arithmetic mean \\[\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n}x_i\\] follows a normal distribution with mean \\(\\mu\\) and variance \\(\\frac{\\sigma^2}{n}\\). This holds regardless of the specific form of \\(f\\). In this example, \\(f\\) is a uniform distribution (set \\(n = 1\\) to see this) and \\(n = 4\\) by default.";
 export const sources = [

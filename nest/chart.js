@@ -9,7 +9,7 @@ import Nest from "../tools/Nest";
 import React from "react";
 import {Form, Button, ButtonGroup} from "react-bootstrap";
 
-export const id = "chart-nest";
+export const id = "nest";
 export const name = "Nested Sampling: Eggbox Example";
 export const readme = "The nested sampling algorithm is very efficient in exploring this highly multimodal, twodimensional likelihood function, which is shaped like an eggbox (assuming a uniform prior for \\(x\\) and \\(y\\) over the interval \\([-5\\pi,5\\pi]\\)): \\[\\mathcal{L}(x,y)=\\left[2+\\cos\\left(\\frac{x}{2}\\right)\\cdot\\cos\\left(\\frac{y}{2}\\right)\\right]^5\\] It also calculates the Bayesian evidence accurately, in this case \\(\\log(\\mathcal{Z})\\approx 235.856\\). The (unweighted) samples are shown in blue, while the currently active points are shown in red.";
 export const sources = [

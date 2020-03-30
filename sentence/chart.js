@@ -14,7 +14,7 @@ import {Form, Row, Col} from "react-bootstrap";
 
 import dataSrc from "./data.json";
 
-export const id = "chart-sentence";
+export const id = "sentence";
 export const name = "Sentence Diagrams";
 export const readme = "In these diagrams, each line segment represents one sentence in the source text, and the length of each segment is proportional to the number of words in the corresponding sentence.";
 export const sources = [

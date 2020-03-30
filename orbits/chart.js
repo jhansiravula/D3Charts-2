@@ -14,7 +14,7 @@ import * as OrbitalMechanics from "../tools/OrbitalMechanics";
 import "./styles.css";
 import dataSrc from "./stars.json";
 
-export const id = "chart-orbits";
+export const id = "orbits";
 export const name = "The S-Stars: Astrometry";
 export const readme = "This visualisation shows the motions of a few of the S-stars as they appear on the sky, while they orbit the supermassive black hole at the center of the Milky Way. The paths are interpolated on the fly from the measured orbital elements. The dashed circle has a diameter of just 0.5'' (or about 23 light days).";
 export const sources = [
