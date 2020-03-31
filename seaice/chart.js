@@ -119,7 +119,7 @@ export function create(el, props) {
       var regions = {
         north: { data: [data_north], domain: [0, 22] },
         south: { data: [data_south], domain: [0, 22] },
-        global: { data: [data_north, data_south], domain: [14, 30] },
+        global: { data: [data_north, data_south], domain: [0, 30] },
       };
 
       d3.keys(regions).forEach(key => regions[key].map = nest.map(d3.merge(regions[key].data)));
