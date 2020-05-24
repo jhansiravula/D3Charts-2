@@ -5,7 +5,8 @@ const d3 = Object.assign({},
   require("d3-random"),
   require("d3-array"),
   require("d3-axis"),
-  require("d3-timer"));
+  require("d3-timer"),
+  require("d3-quadtree"));
 
 import { Vec } from "../tools/Vector";
 
@@ -18,7 +19,8 @@ export const id = "simulitis";
 export const name = "Simulitis";
 export const readme = "This simulation tracks the spread of a fictional desease by contact in a population of blue circles, a fraction of which are stationary, and the rest of which are moving. The red-color desease will spread quickly as soon as the three inially infected circles start to bump into others, thus transmitting the infection. Any infected circle that turns sick after the 'incubation time' is, by default, immediately isolated (excluded from the simulation) until it recovers its blue color after the 'recovery time', or dies. Note that a recovered circle can not be infected again, and that each simulation will yield a somewhat different result because the initial configuration of the circles is random.";
 export const sources = [
-  { url: "https://www.washingtonpost.com/graphics/2020/world/corona-simulator/", description: ["Corona Simulator", "(Washington Post)"] }
+  { url: "https://www.washingtonpost.com/graphics/2020/world/corona-simulator/", description: ["Corona Simulator", "(Washington Post)"] },
+  { url: "https://bl.ocks.org/mbostock/3231298", description: "block #3231298" }
 ];
 
 var simulationTimer, plotTimer;
@@ -183,7 +185,6 @@ export function create(el, props) {
     d.isSick = false;
     d.isRecovered = false;
     d.isDead = false;
-    d.hasInteracted = false;
 
     return d;
   }
@@ -208,61 +209,72 @@ export function create(el, props) {
     }
   }
 
-  function handleInteraction(d1, d2, t) {
-    if (d1 === d2 || d1.hasInteracted || d2.hasInteracted)
-      return;
+  function handleInteraction(d1, t) {
+    var bbox = {
+      x0: d1.pos.x - radius,
+      x1: d1.pos.x + radius,
+      y0: d1.pos.y - radius,
+      y2: d1.pos.y + radius
+    };
 
-    if (d1.isDead || d2.isDead)
-      return; // exclude dead circles from interactions
-
-    if (enableIsolation && (d1.isSick || d2.isSick))
-      return;
-
-    var pos = d1.pos.clone().plus(d2.pos).scale(0.5), // midpoint
-        d1d2 = d1.pos.clone().minus(d2.pos),
-        d2d1 = d1d2.clone().scale(-1),
-        separation = d1d2.length();
-
-    if (separation < 2 * radius) {
-      if ((d1.isSick && d2.isSick) || d1.isRecovered || d2.isRecovered) {
-        // sick or recovered circles can not be infected again
-      } else if (d1.isInfected && !d2.isInfected) {
-        // circle 1 infects circle 2 at this time
-        d2.isInfected = true;
-        d2.infectionTime = t;
-        d1.infectionCount += 1;
-      } else if (!d1.isInfected && d2.isInfected) {
-        // cicle 2 infects circle 1 at this time
-        d1.isInfected = true;
-        d1.infectionTime = t;
-        d2.infectionCount += 1;
+    return function(node, x0, y0, x1, y1) {
+      if (node.data) {
+        // this is leaf node
+        var d2 = node.data;
+    
+        if (d1 === d2)
+          return;
+    
+        if (d1.isDead || d2.isDead)
+          return; // exclude dead circles from interactions
+    
+        if (enableIsolation && (d1.isSick || d2.isSick))
+          return;
+    
+        var pos = d1.pos.clone().plus(d2.pos).scale(0.5), // midpoint
+            d1d2 = d1.pos.clone().minus(d2.pos),
+            d2d1 = d1d2.clone().scale(-1),
+            separation = d1d2.length();
+    
+        if (separation < 2 * radius) {
+          if ((d1.isSick && d2.isSick) || d1.isRecovered || d2.isRecovered) {
+            // sick or recovered circles can not be infected again
+          } else if (d1.isInfected && !d2.isInfected) {
+            // circle 1 infects circle 2 at this time
+            d2.isInfected = true;
+            d2.infectionTime = t;
+            d1.infectionCount += 1;
+          } else if (!d1.isInfected && d2.isInfected) {
+            // cicle 2 infects circle 1 at this time
+            d1.isInfected = true;
+            d1.infectionTime = t;
+            d2.infectionCount += 1;
+          }
+    
+          // update velocities
+          var eps = 0.0001;
+          if (d1.isMoving && d2.isMoving) {
+            var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius));
+            var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius));
+            d1.vel.minus(dvel1);
+            d2.vel.minus(dvel2);
+            d1.pos = pos.clone().plus(d1d2.clone().scale((1 + eps) * radius / separation)); // ensure separation after collision
+            d2.pos = pos.clone().minus(d1d2.clone().scale((1 + eps) * radius / separation));
+          } else if (d1.isMoving && !d2.isMoving) {
+            d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius)).scale(2));
+            d1.pos.plus(d1d2.clone().scale((1 + eps) * radius / separation));
+          } else if (!d1.isMoving && d2.isMoving) {
+            d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius)).scale(2));
+            d2.pos.plus(d2d1.clone().scale((1 + eps) * radius / separation));
+          }
+        }
       }
 
-      // update velocities
-      var eps = 0.0001;
-      if (d1.isMoving && d2.isMoving) {
-        var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius));
-        var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius));
-        d1.vel.minus(dvel1);
-        d2.vel.minus(dvel2);
-        d1.pos = pos.clone().plus(d1d2.clone().scale((1 + eps) * radius / separation)); // ensure separation after collision
-        d2.pos = pos.clone().minus(d1d2.clone().scale((1 + eps) * radius / separation));
-      } else if (d1.isMoving && !d2.isMoving) {
-        d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius)).scale(2));
-        d1.pos.plus(d1d2.clone().scale((1 + eps) * radius / separation));
-      } else if (!d1.isMoving && d2.isMoving) {
-        d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius)).scale(2));
-        d2.pos.plus(d2d1.clone().scale((1 + eps) * radius / separation));
-      }
-
-      d1.hasInteracted = true;
-      d2.hasInteracted = true;
-    }
+      return x0 > bbox.x1 || x1 < bbox.x0 || y0 > bbox.y1 || y1 < bbox.y0;
+    };
   }
 
   function propagate(d, t) {
-    d.hasInteracted = false; // reset interaction check
-
     if (d.isDead)
       return;
 
@@ -308,7 +320,14 @@ export function create(el, props) {
 
   function updateSimulation(t) {
     data.forEach(handleBoundaries);
-    data.forEach(d1 => data.forEach(d2 => handleInteraction(d1, d2, t)));
+
+    var tree = d3.quadtree()
+      .x(d => d.pos.x)
+      .y(d => d.pos.y)
+      .addAll(data);
+
+    data.forEach(d1 => tree.visit(handleInteraction(d1, t)));
+
     data.forEach(d => propagate(d, t));
 
     var circles = simulationArea.selectAll("circle").data(data);
