@@ -165,6 +165,29 @@ export function create(el, props) {
     return new Vec(initialSpeed * Math.cos(angle), initialSpeed * Math.sin(angle));
   }
 
+  function generateCircle(isInfected) {
+    var d = {};
+    
+    d.isInfected = isInfected;
+
+    // generate circle position and velocity
+    d.pos = generatePosVec();
+    d.isMoving = (randomProb() < movementRate) || d.isInfected;
+    if (d.isMoving)
+      d.vel = generateVelVec();
+    else
+      d.vel = new Vec(0, 0);
+
+    d.infectionTime = 0;
+    d.infectionCount = 0;
+    d.isSick = false;
+    d.isRecovered = false;
+    d.isDead = false;
+    d.hasInteracted = false;
+
+    return d;
+  }
+
   function handleBoundaries(d) {
     var bounds = [radius, size - radius];
     if (d.pos.x < bounds[0]) {
@@ -276,30 +299,8 @@ export function create(el, props) {
     yScale = yScale.domain([0, n]);
     plotArea.select(".axis-y").transition().call(d3.axisRight(yScale));
 
-    // generate a new circle population
-    data = d3.range(n).map((i) => ({
-      pos: generatePosVec(),
-      isMoving: randomProb() < movementRate,
-      isInfected: i < 3, // start with a few infected circles
-      infectionTime: 0,
-      infectionCount: 0,
-      isSick: false,
-      isRecovered: false,
-      isDead: false,
-      hasInteracted: false
-    }));
-
-    data.forEach(d => {
-      // initially infected circles shall move
-      if (d.isInfected)
-        d.isMoving = true;
-
-      // generate velocities
-      if (d.isMoving)
-        d.vel = generateVelVec();
-      else
-        d.vel = new Vec(0, 0);
-    });
+    // generate a new circle population (starting with a few infected circles)
+    data = d3.range(n).map(i => generateCircle(i < 3));
 
     simulationTimer = d3.interval(updateSimulation, 20);
     plotTimer = d3.interval(updatePlot, 40);
