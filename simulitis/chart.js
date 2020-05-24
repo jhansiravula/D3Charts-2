@@ -241,17 +241,17 @@ export function create(el, props) {
       // update velocities
       var eps = 0.0001;
       if (d1.isMoving && d2.isMoving) {
-        var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (separation * separation));
-        var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (separation * separation));
+        var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius));
+        var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius));
         d1.vel.minus(dvel1);
         d2.vel.minus(dvel2);
         d1.pos = pos.clone().plus(d1d2.clone().scale((1 + eps) * radius / separation)); // ensure separation after collision
         d2.pos = pos.clone().minus(d1d2.clone().scale((1 + eps) * radius / separation));
       } else if (d1.isMoving && !d2.isMoving) {
-        d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (separation * separation)).scale(2));
+        d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius)).scale(2));
         d1.pos.plus(d1d2.clone().scale((1 + eps) * radius / separation));
       } else if (!d1.isMoving && d2.isMoving) {
-        d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (separation * separation)).scale(2));
+        d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius)).scale(2));
         d2.pos.plus(d2d1.clone().scale((1 + eps) * radius / separation));
       }
 
