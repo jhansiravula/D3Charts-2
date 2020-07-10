@@ -3,8 +3,9 @@ const d3 = Object.assign({},
   require("d3-array"),
   require("d3-scale"),
   require("d3-axis"),
-  require("d3-fetch"),
-  require("d3-voronoi"));
+  require("d3-fetch"));
+
+import { Delaunay } from "d3-delaunay";
 
 import React from "react";
 import { Form, Row, Col } from "react-bootstrap";
@@ -92,20 +93,15 @@ export function create(el, props) {
     d3.select("#control-distance-location")
       .on("change", function() { change(this.value); })
 
-    var voronoi = d3.voronoi()
-      .x(d => x(d.date))
-      .y(d => y(d.value))
-      .extent([[0, 0], [width, height]]);
-
-    var polygons = voronoi(data).polygons();
+    var voronoi = Delaunay.from(data, d => x(d.date), d => y(d.value))
+      .voronoi([0, 0, width, height]);
 
     var points = svg.selectAll(".point").data(data)
       .enter().append("g")
         .attr("class", "point selected");
 
     points.append("path")
-      .datum((_, i) => polygons[i])
-      .attr("d", d => `M${d.join("L")}Z`);
+      .attr("d", (_, i) => voronoi.renderCell(i));
 
     points.append("circle")
       .attr("cx", d => x(d.date))
