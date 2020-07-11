@@ -10,7 +10,7 @@ const d3 = Object.assign({},
 import numeric from "numeric";
 
 import React from "react";
-import { Form, Row, Col } from "react-bootstrap";
+import { Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
 import dataSrc from "./data.json";
 
@@ -25,18 +25,13 @@ export const sources = [
 
 export function controls() {
   return (
-    <Form>
-      <Form.Group as={Row}>
-        <Form.Label column md={2}>
-          Source Text
-        </Form.Label>
-        <Col md={5}>
-         <Form.Control id="control-sentence-text" as="select" defaultValue="pg174.txt">
-            <option value="pg174.txt">The Picture of Dorian Gray</option>
-            <option value="pg1260.txt">Jane Eyre</option>
-            <option value="pg1400.txt">Great Expectations</option>
-         </Form.Control>
-        </Col>
+    <Form style={{marginTop: 20}}>
+      <Form.Group style={{textAlign: "center"}}>
+        <ToggleButtonGroup id="control-sentence-text" type="radio" name="text" defaultValue="pg174.txt" size="sm">      
+          <ToggleButton variant="light" value="pg174.txt">The Picture of Dorian Gray</ToggleButton>
+          <ToggleButton variant="light" value="pg1260.txt">Jane Eyre</ToggleButton>
+          <ToggleButton variant="light" value="pg1400.txt">Great Expectations</ToggleButton>
+        </ToggleButtonGroup>
       </Form.Group>
     </Form>
   );
@@ -128,9 +123,9 @@ export function create(el, props) {
   }
 
   d3.json(dataSrc).then(function(counts) {
-    render(counts.find(d => d.fileName == d3.select("#control-sentence-text").node().value));
+    render(counts.find(d => d.fileName == d3.select("#control-sentence-text").select("input:checked").property("value")));
 
-    d3.select("#control-sentence-text")
+    d3.select("#control-sentence-text").selectAll("input")
       .on("change", function() { render(counts.find(d => d.fileName == this.value)); })
   });
 }

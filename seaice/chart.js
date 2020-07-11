@@ -13,7 +13,7 @@ import data_north_csv from "./data_north.csv"
 import data_south_csv from "./data_south.csv"
 
 import React from "react";
-import { Form, Row, Col } from "react-bootstrap";
+import { Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
 export const id = "seaice";
 export const name = "Sea Ice Index";
@@ -24,25 +24,20 @@ export const sources = [
 
 export function controls() {
   return (
-    <Form>
-      <Form.Group as={Row}>
-        <Form.Label column md={1}>
-          Data
-        </Form.Label>
-        <Col md={4}>
-         <Form.Control id="control-seaice-region" as="select" defaultValue="north">
-           <option value="north">Arctic Sea Ice (NH)</option>
-           <option value="south">Antarctic Sea Ice (SH)</option>
-           <option value="global">Global Sea Ice</option>
-         </Form.Control>
-        </Col>
+    <Form style={{marginTop: 20}}>
+      <Form.Group style={{textAlign: "center"}}>
+        <ToggleButtonGroup id="control-seaice-region" type="radio" name="region" defaultValue="north" size="sm">      
+          <ToggleButton variant="light" value="north">Arctic Sea Ice (NH)</ToggleButton>
+          <ToggleButton variant="light" value="south">Antarctic Sea Ice (SH)</ToggleButton>
+          <ToggleButton variant="light" value="global">Global Sea Ice</ToggleButton>
+        </ToggleButtonGroup>
       </Form.Group>
     </Form>
   );
 }
 
 export function create(el, props) {
-  var margin = { top: 20, right: 20, bottom: 60, left: 40 };
+  var margin = { top: 20, right: 20, bottom: 30, left: 40 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
@@ -142,9 +137,9 @@ export function create(el, props) {
           .attr("d", d => line(d.data));
       }
 
-      change(d3.select("#control-seaice-region").node().value);
+      change(d3.select("#control-seaice-region").select("input:checked").property("value"));
 
-      d3.select("#control-seaice-region")
+      d3.select("#control-seaice-region").selectAll("input")
         .on("change", function() { change(this.value); });
 
       svg

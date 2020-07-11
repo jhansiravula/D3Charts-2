@@ -27,24 +27,12 @@ var simulationTimer, plotTimer;
 
 export function controls() {
   return (
-    <Container>
+    <Container style={{marginTop: 20}}>
       <Row>
-        <Col md={6}>
+        <Col md={12}>
           <Form>
             <Form.Group>
               <Button id="control-simulitis-restart" variant="success">Restart Simulation</Button>
-            </Form.Group>
-          </Form>
-        </Col>
-        <Col md={6}>
-          <Form>
-            <Form.Group as={Row}>
-              <Form.Label column xs={6}>
-                Isolation
-              </Form.Label>
-              <Col xs={6} style={{paddingTop: 5}}>        
-                <input id="control-simulitis-enableIsolation" type="checkbox" defaultChecked/>
-              </Col>
             </Form.Group>
           </Form>
         </Col>
@@ -53,18 +41,18 @@ export function controls() {
         <Col md={6}>
           <Form>
             <Form.Group as={Row}>
-              <Form.Label column xs={6}>
+              <Form.Label column xs={4}>
                 Incubation Time
               </Form.Label>
-              <Col xs={6} style={{paddingTop: 10}}>
+              <Col xs={6} style={{paddingTop: 5}}>
                 <input id="control-simulitis-incubationTime" type="range" min="1000" max="9000" defaultValue="3000" step="100"/>
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
-              <Form.Label column xs={6}>
+              <Form.Label column xs={4}>
                 Recovery Time
               </Form.Label>
-              <Col xs={6} style={{paddingTop: 10}}>        
+              <Col xs={6} style={{paddingTop: 5}}>        
                 <input id="control-simulitis-recoveryTime" type="range" min="1000" max="9000" defaultValue="3000" step="100"/>
               </Col>
             </Form.Group>
@@ -73,18 +61,18 @@ export function controls() {
         <Col md={6}>
           <Form>
             <Form.Group as={Row}>
-              <Form.Label column xs={6}>
+              <Form.Label column xs={4}>
                 Movement
               </Form.Label>
-              <Col xs={6} style={{paddingTop: 10}}>
+              <Col xs={6} style={{paddingTop: 5}}>
                 <input id="control-simulitis-movementRate" type="range" min="0.1" max="1" defaultValue="0.9" step="0.05"/>
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
-              <Form.Label column xs={6}>
+              <Form.Label column xs={4}>
                 Fatality Rate
               </Form.Label>
-              <Col xs={6} style={{paddingTop: 10}}>        
+              <Col xs={6} style={{paddingTop: 5}}>        
                 <input id="control-simulitis-fatalityRate" type="range" min="0" max="1" defaultValue="0.01" step="0.01"/>
               </Col>
             </Form.Group>
@@ -96,7 +84,7 @@ export function controls() {
 }
 
 export function create(el, props) {
-  var margin = { top: 20, right: 30, bottom: 20, left: 10 };
+  var margin = { top: 20, right: 30, bottom: 10, left: 10 };
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
@@ -117,7 +105,7 @@ export function create(el, props) {
       incubationTime = 3000,
       recoveryTime = 3000,
       fatalityRate = 0.01,
-      enableIsolation = true,
+      enableIsolation = false,
       movementRate = 0.9;
 
   var data = [];
@@ -406,9 +394,6 @@ export function create(el, props) {
 
   d3.select("#control-simulitis-fatalityRate")
     .on("change", function() { fatalityRate = +this.value; restart(); });
-
-  d3.select("#control-simulitis-enableIsolation")
-    .on("change", function() { enableIsolation = this.checked; restart(); });
 
   restart();
 }

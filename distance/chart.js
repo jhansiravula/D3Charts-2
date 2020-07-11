@@ -8,7 +8,7 @@ const d3 = Object.assign({},
 import { Delaunay } from "d3-delaunay";
 
 import React from "react";
-import { Form, Row, Col } from "react-bootstrap";
+import { Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
 import "./styles.css";
 import dataSrc from "./data.json";
@@ -25,20 +25,15 @@ export const sources = [
 
 export function controls() {
   return (
-    <Form>
-      <Form.Group as={Row}>
-        <Form.Label column md={2}>
-          Location
-        </Form.Label>
-        <Col md={5}>
-         <Form.Control id="control-distance-location" as="select" defaultValue="Any">
-           <option value="Any">Any</option>
-           <option value="GC">Galactic Center</option>
-           <option value="B">Bulge</option>
-           <option value="DSN">Disk & Solar Neighborhood</option>
-           <option value="IH">Halo</option>
-         </Form.Control>
-        </Col>
+    <Form style={{marginTop: 20}}>
+      <Form.Group style={{textAlign: "center"}}>
+        <ToggleButtonGroup id="control-distance-location" type="radio" name="location" defaultValue="Any" size="sm">
+          <ToggleButton variant="light" value="Any">Any Location</ToggleButton>
+          <ToggleButton variant="light" value="GC">Galactic Center</ToggleButton>
+          <ToggleButton variant="light" value="B">Bulge</ToggleButton>
+          <ToggleButton variant="light" value="DSN">Disk & Solar Neighborhood</ToggleButton>
+          <ToggleButton variant="light" value="IH">Halo</ToggleButton>
+        </ToggleButtonGroup>
       </Form.Group>
     </Form>
   );
@@ -90,9 +85,6 @@ export function create(el, props) {
   d3.json(dataSrc).then(function(data) {
     data.forEach(d => d.date = new Date(d.date));
 
-    d3.select("#control-distance-location")
-      .on("change", function() { change(this.value); })
-
     var voronoi = Delaunay.from(data, d => x(d.date), d => y(d.value))
       .voronoi([0, 0, width, height]);
 
@@ -141,7 +133,10 @@ export function create(el, props) {
         .attr("y2", y(R0));
     }
 
-    change();
+    change(d3.select("#control-distance-location").select("input:checked").property("value"));
+
+    d3.select("#control-distance-location").selectAll("input")
+      .on("change", function() { change(this.value); })
   });
 }
 

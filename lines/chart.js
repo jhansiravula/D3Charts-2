@@ -27,7 +27,7 @@ var sampling;
 export function controls() {
   return(
     <Form style={{marginTop: 20}}>
-      <Form.Group>
+      <Form.Group style={{textAlign: "center"}}>
         <ButtonGroup>
           <Button id="control-lines-sample" variant="warning">New Data</Button>
           <Button id="control-lines-start" variant="success">Start Sampling</Button>
@@ -38,7 +38,7 @@ export function controls() {
         <Form.Label column md={4}>
           Strength of broad component
         </Form.Label>
-        <Col md={4} style={{paddingTop: 10}}>        
+        <Col md={4} style={{paddingTop: 5}}>        
           <input id="control-lines-strength" type="range" min="0" max="0.5" defaultValue="0.4" step="0.01"/>
         </Col>
       </Form.Group>  
@@ -46,7 +46,7 @@ export function controls() {
         <Form.Label column md={4}>
           Width of broad component
         </Form.Label>
-        <Col md={4} style={{paddingTop: 10}}>        
+        <Col md={4} style={{paddingTop: 5}}>        
           <input id="control-lines-width" type="range" min="1" max="3" defaultValue="2.6" step="0.01"/>
         </Col>
       </Form.Group>                  

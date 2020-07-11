@@ -9,7 +9,7 @@ const d3 = Object.assign({},
 import { clamp } from "../tools/Math";
 
 import React from "react";
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { Form, Row, Col, Button, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
 import "./styles.css";
 
@@ -27,15 +27,15 @@ export function controls() {
         <Col md={3}>
         </Col>
         <Col md={9}>
-          <Button className="control" id="control-refrac-total" variant="dark">Total Reflection</Button>{" "}
-          <Button className="control" id="control-refrac-zero" variant="dark">No Reflection</Button>
+          <Button className="control" id="control-refrac-total" variant="light" size="sm">Total Reflection</Button>{" "}
+          <Button className="control" id="control-refrac-zero" variant="light" size="sm">No Reflection</Button>
         </Col>
       </Form.Group>
       <Form.Group as={Row}>
         <Form.Label column md={3}>
           Refractive Index
         </Form.Label>
-        <Col md={6} style={{paddingTop: 10}}>        
+        <Col md={6} style={{paddingTop: 5}}>        
           <input className="control" id="control-refrac-n" type="range" min="0.01" max="3" defaultValue="1.5" step="0.01"/>
         </Col>
       </Form.Group>
@@ -44,8 +44,10 @@ export function controls() {
           Polarization
         </Form.Label>
         <Col md={6} style={{paddingTop: 5}}>
-          <Form.Check inline label="Perpendicular" className="control control-refrac-pol" type="radio" name="pol" defaultValue="s" defaultChecked/>
-          <Form.Check inline label="Parallel" className="control control-refrac-pol" type="radio" name="pol" defaultValue="p"/>
+          <ToggleButtonGroup id="control-refrac-pol" type="radio" name="pol" defaultValue="s" size="sm">      
+            <ToggleButton variant="light" value="s">Perpendicular</ToggleButton>
+            <ToggleButton variant="light" value="p">Parallel</ToggleButton>
+          </ToggleButtonGroup>
         </Col>
       </Form.Group>
     </Form>
@@ -70,7 +72,7 @@ export function create(el, props) {
   var state = {
     _n: 1.5, // refractive index
     _a: Math.PI / 8, // angle of incidence
-    _pol: "s", // polarization (s: perpendicular, p: parallel)
+    _pol: d3.select("#control-refrac-pol").select("input:checked").property("value"), // polarization (s: perpendicular, p: parallel)
     get n() {
       return this._n;
     },
@@ -218,8 +220,7 @@ export function create(el, props) {
       updateAll();
     });
 
-  d3.selectAll(".control-refrac-pol")
-    .select("input")
+  d3.select("#control-refrac-pol").selectAll("input")
     .on("change", function() {
       state.pol = this.value;
       updateAll();

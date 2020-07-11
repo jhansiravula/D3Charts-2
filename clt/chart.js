@@ -24,25 +24,20 @@ var timer;
 
 export function controls() {
   return (
-    <Form>
+    <Form style={{marginTop: 20}}>
       <Form.Group as={Row}>
         <Form.Label column md={2}>
           Number
         </Form.Label>
-        <Col md={3}>
-         <Form.Control id="control-clt-number" as="select" defaultValue="4">
-           <option value="1">n = 1</option>
-           <option value="4">n = 4</option>
-           <option value="8">n = 8</option>
-           <option value="16">n = 16</option>
-         </Form.Control>
+        <Col md={3} style={{paddingTop: 5}}>
+         <input id="control-clt-number" type="range" min="1" max="16" defaultValue="4" step="1"/>
         </Col>
       </Form.Group>
       <Form.Group as={Row}>
         <Form.Label column md={2}>
           Speed
         </Form.Label>
-        <Col md={3} style={{paddingTop: 10}}>        
+        <Col md={3} style={{paddingTop: 5}}>        
           <input id="control-clt-speed" type="range" min="0" max="1" defaultValue="0" step="0.01"/>
         </Col>
       </Form.Group>

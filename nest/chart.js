@@ -23,7 +23,7 @@ var sampling;
 export function controls() {
   return(
     <Form style={{marginTop: 20}}>
-      <Form.Group>
+      <Form.Group style={{textAlign: "center"}}>
         <ButtonGroup>
           <Button id="control-nest-start" variant="success">Start Sampling</Button>
           <Button id="control-nest-abort">Abort Sampling</Button>

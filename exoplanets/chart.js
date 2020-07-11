@@ -6,7 +6,7 @@ const d3 = Object.assign({},
   require("d3-hierarchy"));
 
 import React from "react";
-import { Form, Row, Col } from "react-bootstrap";
+import { Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
 var url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?&table=exoplanets&select=pl_hostname,pl_orbsmax,pl_bmassj,pl_radj&where=pl_orbsmax%20is%20not%20null%20and%20pl_bmassj%20is%20not%20null%20and%20pl_radj%20is%20not%20null&format=csv";
 
@@ -21,17 +21,14 @@ export const sources = [
 
 export function controls() {
   return (
-    <Form>
-      <Form.Group as={Row}>
-        <Form.Label column md={2}>
-          Sort by:
-        </Form.Label>
-        <Col md={10} style={{paddingTop: 5}}>      
-          <Form.Check inline label="Nothing" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="undefined" defaultChecked/>
-          <Form.Check inline label="Radius" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="radius"/>
-          <Form.Check inline label="Mass" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="mass"/>
-          <Form.Check inline label="Separation" className="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="separation"/>
-        </Col>
+    <Form style={{marginTop: 20}}>
+      <Form.Group style={{textAlign: "center"}}>
+       <ToggleButtonGroup id="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="undefined" size="sm">      
+         <ToggleButton variant="light" value="undefined">No sorting</ToggleButton>
+         <ToggleButton variant="light" value="radius">Sort by radius</ToggleButton>
+         <ToggleButton variant="light" value="mass">Sort by mass</ToggleButton>
+         <ToggleButton variant="light" value="separation">Sort by separation</ToggleButton>
+       </ToggleButtonGroup>
       </Form.Group>
     </Form>
   );
@@ -96,16 +93,18 @@ export function create(el, props) {
       var nodes = svg.append("g")
         .attr("transform", `translate(${(width-size)/2},${(height-size)/2})`);
 
-      render();
+      function change(prop) {
+        root.sort(sortBy(prop));
+        render();
+      };
+
+      change(d3.select("#control-exoplanets-sorting").select("input:checked").property("value"));
+      
       svg.select(".node")
         .each(focus); // focus on first node
 
-      d3.selectAll(".control-exoplanets-sorting")
-        .select("input")
-        .on("change", function() {
-          root.sort(sortBy(this.value));
-          render();
-        });
+      d3.select("#control-exoplanets-sorting").selectAll("input")
+        .on("change", function() { change(this.value); });
 
       function render() {
         pack(root);
@@ -149,7 +148,7 @@ export function create(el, props) {
     .catch(function() {
       svg.select(".message")
         .text("Failed to load data.");
-    });;
+    });
 
   function number(x, p) {
     return d3.format("." + p + "f")(x);
