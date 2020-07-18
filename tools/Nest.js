@@ -360,7 +360,7 @@ function vol_prefactor(n) {
 function randsphere(n) {
   // draw a random point within an n-dimensional unit sphere
 
-  var z = numeric._random([n], 0, randomNormal());
+  var z = Array.from({length: n}, randomNormal());
   return numeric.mul(z, Math.pow(Math.random(), 1. / n) / Math.sqrt(numeric.sum(numeric.pow(z, 2))))
 }
 
