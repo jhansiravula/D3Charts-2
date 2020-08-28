@@ -46,56 +46,30 @@ export function create(el, props) {
 
   var options = [
     { name: "Aitoff", projection: d3.geoAitoff() },
-    //{ name: "August", projection: d3.geoAugust() },
     { name: "Baker", projection: d3.geoBaker() },
     { name: "Boggs", projection: d3.geoBoggs() },
-    //{ name: "Bottomley", projection: d3.geoBottomley() },
-    { name: "Bromley", projection: d3.geoBromley() },
-    { name: "Craster Parabolic", projection: d3.geoCraster() },
-    { name: "Eckert I", projection: d3.geoEckert1() },
-    //{ name: "Eckert II", projection: d3.geoEckert2() },
-    { name: "Eckert III", projection: d3.geoEckert3() },
-    //{ name: "Eckert IV", projection: d3.geoEckert4() },
-    { name: "Eckert V", projection: d3.geoEckert5() },
-    //{ name: "Eckert VI", projection: d3.geoEckert6() },
-    //{ name: "Eisenlohr", projection: d3.geoEisenlohr() },
-    { name: "Equirectangular (Plate Carrée)", projection: d3.geoEquirectangular() },
-    { name: "Fahey", projection: d3.geoFahey() },
+    { name: "Bottomley", projection: d3.geoBottomley() },
+    { name: "Craster", projection: d3.geoCraster() },
+    { name: "CylindricalEqualArea", projection: d3.geoCylindricalEqualArea() },
+    { name: "Eckert1", projection: d3.geoEckert1() },
+    { name: "Eckert3", projection: d3.geoEckert3() },
+    { name: "Eisenlohr", projection: d3.geoEisenlohr() },
     { name: "Foucaut", projection: d3.geoFoucaut() },
-    { name: "Ginzburg VIII", projection: d3.geoGinzburg8() },
+    { name: "Gilbert", projection: d3.geoGilbert() },
+    { name: "Ginzburg9", projection: d3.geoGinzburg9() },
     { name: "Gringorten", projection: d3.geoGringorten() },
-    { name: "Guyou", projection: d3.geoGuyou() },
     { name: "Hammer", projection: d3.geoHammer() },
-    { name: "Goode Homolosine", projection: d3.geoHomolosine() },
-    { name: "Kavrayskiy VII", projection: d3.geoKavrayskiy7() },
-    { name: "Lambert Cylindrical Equal-Area", projection: d3.geoCylindricalEqualArea() },
     { name: "Lagrange", projection: d3.geoLagrange() },
-    //{ name: "Loximuthal", projection: d3.geoLoximuthal() },
-    { name: "Miller", projection: d3.geoMiller() },
-    { name: "McBryde–Thomas Flat-Polar Parabolic", projection: d3.geoMtFlatPolarParabolic() },
-    { name: "McBryde–Thomas Flat-Polar Quartic", projection: d3.geoMtFlatPolarQuartic() },
-    { name: "McBryde–Thomas Flat-Polar Sinusoidal", projection: d3.geoMtFlatPolarSinusoidal() },
     { name: "Mollweide", projection: d3.geoMollweide() },
-    { name: "Natural Earth", projection: d3.geoNaturalEarth() },
-    //{ name: "Natural Earth II", projection: d3.geoNaturalEarth2() },
-    { name: "Nell–Hammer", projection: d3.geoNellHammer() },
-    { name: "Patterson", projection: d3.geoPatterson() },
-    //{ name: "Polyconic", projection: d3.geoPolyconic() },
-    { name: "Robinson", projection: d3.geoRobinson() },
-    { name: "Sinusoidal", projection: d3.geoSinusoidal() },
-    { name: "Times", projection: d3.geoTimes() },
-    { name: "van der Grinten", projection: d3.geoVanDerGrinten() },
-    //{ name: "van der Grinten II", projection: d3.geoVanDerGrinten() },
-    { name: "van der Grinten III", projection: d3.geoVanDerGrinten() },
-    //{ name: "van der Grinten IV", projection: d3.geoVanDerGrinten4() },
-    { name: "Wagner IV", projection: d3.geoWagner4() },
-    //{ name: "Wagner VI", projection: d3.geoWagner6() },
-    { name: "Winkel Tripel", projection: d3.geoWinkel3() }
-  ];
+    { name: "NaturalEarth1", projection: d3.geoNaturalEarth1() },
+    { name: "Nicolosi", projection: d3.geoNicolosi() }
+  ].reverse();
 
   function getProjection() {
-    var i = Math.floor(d3.randomUniform(options.length)());
-    return options[i].projection;
+    var option = options.pop();
+    options.unshift(option);
+    //console.log(option.name);
+    return option.projection;
   }
 
   d3.csv(dataSrc, row).then(function(stars) {

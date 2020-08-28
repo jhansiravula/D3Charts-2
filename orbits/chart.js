@@ -156,7 +156,7 @@ export function create(el, props) {
       .attr("y", ".3em")
       .text(d => d.key);
 
-    node.on("click", function(d) {
+    node.on("click", function(event, d) {
       d3.select(this).select("circle").attr("opacity", 1);
       render(d.key);
     });

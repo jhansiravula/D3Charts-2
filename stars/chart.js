@@ -102,14 +102,14 @@ export function create(el, props) {
     var v0, r0, q0;
     var drag = d3.drag();
 
-    drag.on("start", function() {
-      v0 = versor.cartesian(projection.invert(d3.mouse(this)));
+    drag.on("start", function(event) {
+      v0 = versor.cartesian(projection.invert(d3.pointer(event, this)));
       r0 = projection.rotate();
       q0 = versor(r0);
     });
 
-    drag.on("drag", function() {
-      var v1 = versor.cartesian(projection.rotate(r0).invert(d3.mouse(this))),
+    drag.on("drag", function(event) {
+      var v1 = versor.cartesian(projection.rotate(r0).invert(d3.pointer(event, this))),
           q1 = versor.multiply(q0, versor.delta(v0, v1)),
           r1 = versor.rotation(q1);
       projection.rotate(r1);

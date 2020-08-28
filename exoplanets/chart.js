@@ -54,7 +54,7 @@ export function create(el, props) {
     .text("Loading data from the NASA Exoplanet Archive ...");
 
   svg.append("text")
-    .attr("class", "name")
+    .attr("class", "info name")
     .style("font-weight", "bold")
     .style("font-size", "120%");
 
@@ -99,9 +99,6 @@ export function create(el, props) {
       };
 
       change(d3.select("#control-exoplanets-sorting").select("input:checked").property("value"));
-      
-      svg.select(".node")
-        .each(focus); // focus on first node
 
       d3.select("#control-exoplanets-sorting").selectAll("input")
         .on("change", function() { change(this.value); });
@@ -118,21 +115,25 @@ export function create(el, props) {
           .on("click", focus)
           .on("mouseover", focus)
         .merge(node)
+          .style("stroke-width", 1)
           .style("fill", d => color(d.data.rho))
           .transition().duration(750)
           .attr("cx", d => d.x)
           .attr("cy", d => d.y)
           .attr("r", d => d.r);
+
+        d3.selectAll(".info")
+          .text("");
       }
 
-      function focus(d) {
+      function focus(event, d) {
         svg.selectAll(".node")
           .style("stroke-width", 1);
 
         d3.select(this)
           .style("stroke-width", 3);
 
-        svg.select(".name")
+        svg.select(".info.name")
           .text(d.data.name);
 
         svg.select(".info.radius")

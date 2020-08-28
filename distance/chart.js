@@ -106,7 +106,7 @@ export function create(el, props) {
       .attr("y1", d => y(d.value - d.error))
       .attr("y2", d => y(d.value + d.error));
 
-    points.on("mouseover", function(d) {
+    points.on("mouseover", function(event, d) {
       if (d3.select(this).classed("selected")) {
         d3.selectAll(".point").classed("hover", false);
         d3.select(this).classed("hover", true);

@@ -146,8 +146,8 @@ export function create(el, props) {
         .on("mousemove", hover)
         .on("touchmove", hover);
 
-      function hover() {
-        var p = d3.mouse(this);
+      function hover(event) {
+        var p = d3.pointer(event);
         var year = z(p[0]);
 
         svg.select(".inset")
