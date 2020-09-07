@@ -20,6 +20,9 @@ export const sources = [
   { url: "https://en.wikipedia.org/wiki/Refraction", description: ["Refraction", "(Wikipedia)"] }
 ];
 
+const amax =  0.9 * Math.PI / 2;
+const amin = -amax;
+
 export function controls() {
   return (
     <Form style={{marginTop: 20}}>
@@ -29,6 +32,14 @@ export function controls() {
         <Col md={9}>
           <Button className="control" id="control-refrac-total" variant="light" size="sm">Total Reflection</Button>{" "}
           <Button className="control" id="control-refrac-zero" variant="light" size="sm">No Reflection</Button>
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column md={3}>
+          Angle of incidence
+        </Form.Label>
+        <Col md={6} style={{paddingTop: 5}}>        
+          <input className="control" id="control-refrac-a" type="range" min={amin} max={amax} defaultValue={Math.PI / 8} step="0.01"/>
         </Col>
       </Form.Group>
       <Form.Group as={Row}>
@@ -70,8 +81,8 @@ export function create(el, props) {
   var line = d3.line();
 
   var state = {
-    _n: 1.5, // refractive index
-    _a: Math.PI / 8, // angle of incidence
+    _n: +d3.select("#control-refrac-n").property("value"), // refractive index
+    _a: +d3.select("#control-refrac-a").property("value"), // angle of incidence
     _pol: d3.select("#control-refrac-pol").select("input:checked").property("value"), // polarization (s: perpendicular, p: parallel)
     get n() {
       return this._n;
@@ -123,7 +134,9 @@ export function create(el, props) {
     }
   };
 
-  state.update(); // set up defaults
+  // set up defaults
+  state.update();
+  updateControls();
 
   var radius = width / 2,
       origin = [0, height / 2],
@@ -141,6 +154,12 @@ export function create(el, props) {
     .attr("class", "label")
     .attr("y", height)
     .text(`n = ${state.n}`);
+
+  function updateControls()
+  {
+    d3.select("#control-refrac-a")
+      .property("value", state.a);
+  }
 
   function updateData() {
     // input ray
@@ -194,6 +213,7 @@ export function create(el, props) {
   }
 
   function updateAll() {
+    updateControls();
     updateData();
     updateChart();
   }
@@ -210,6 +230,12 @@ export function create(el, props) {
       svg.transition()
         .duration(dt / 8)
         .tween("rotate", rotateTween(state.aB));
+    });
+
+  d3.select("#control-refrac-a")
+    .on("input", function() {
+      state.a = +this.value;
+      updateAll();
     });
 
   d3.select("#control-refrac-n")
@@ -262,9 +288,9 @@ export function create(el, props) {
       updateChart();
 
       svg.select(".surface")
-        .call(d3.drag().on("drag", function() {
-          var mouse = d3.mouse(this);
-          state.a = clamp(Math.atan(-(mouse[0] - pivot[0]) / (mouse[1] - pivot[1])), -0.9 * Math.PI / 2, 0.9 * Math.PI / 2);
+        .call(d3.drag().on("drag", function(event) {
+          var pointer = d3.pointer(event, this);
+          state.a = clamp(Math.atan(-(pointer[0] - pivot[0]) / (pointer[1] - pivot[1])), amin, amax);
           updateAll();
         }));
     });

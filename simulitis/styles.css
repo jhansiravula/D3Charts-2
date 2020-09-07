@@ -29,15 +29,13 @@ circle.dead {
 path.healthy {
   fill: none;
   stroke: #1f77b4;
-  stroke-width: 3px;
-}
-path.infected {
-  fill: none;
-  stroke: #d62728;
   stroke-width: 1px;
 }
 path.sick {
   fill: none;
   stroke: #d62728;
+  stroke-width: 1px;
+}
+path.smooth {
   stroke-width: 3px;
 }

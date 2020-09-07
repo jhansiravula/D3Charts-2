@@ -27,7 +27,7 @@ export function controls() {
     <Form style={{marginTop: 20}}>
       <Form.Group as={Row}>
         <Form.Label column md={2}>
-          Number
+          Sample Size
         </Form.Label>
         <Col md={3} style={{paddingTop: 5}}>
          <input id="control-clt-number" type="range" min="1" max="16" defaultValue="4" step="1"/>
@@ -58,12 +58,12 @@ export function create(el, props) {
   .append("g")
    .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  var dt = 1000, // time step
-      n = 4; // sample size
-
   var speed = d3.scaleLinear()
     .domain([0, 1])
-    .range([dt, 100]);
+    .range([1000, 100]);
+
+  var dt = speed(+d3.select("#control-clt-speed").property("value")), // time step
+      n = +d3.select("#control-clt-number").property("value"); // sample size
 
   var f = {
     sample: Math.random,

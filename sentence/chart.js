@@ -111,6 +111,8 @@ export function create(el, props) {
 
     var path = svg.select("path")
       .datum(data)
+      .attr("stroke-width", 1)
+      .attr("stroke-opacity", 0.2)
       .attr("d", line);
 
     var totalLength = path.node().getTotalLength();

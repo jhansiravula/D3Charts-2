@@ -115,10 +115,10 @@ export function create(el, props) {
   var t = 0, // animation time
       dt = 0.05; // time step
 
-  var tau = 1, // pulse width
-      w0 = 1, // frequency
-      k0 = 5, // 1. wavenumber
-      k1 = 1; // 2. wavenumber
+  var tau = +d3.select("#control-pulse-tau").property("value"), // pulse width
+      w0 = +d3.select("#control-pulse-w0").property("value"), // frequency
+      k0 = +d3.select("#control-pulse-k0").property("value"), // 1. wavenumber
+      k1 = +d3.select("#control-pulse-k1").property("value"); // 2. wavenumber
 
   d3.select("#control-pulse-tau")
     .on("change", function() { tau = +this.value; });

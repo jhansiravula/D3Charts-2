@@ -132,8 +132,8 @@ export function create(el, props) {
 
   var state = {
     npoints: 30, // number of active points
-    _strength: +d3.select("#control-lines-strength").node().value, // strength of broad component
-    _width: +d3.select("#control-lines-width").node().value, // width of broad component
+    _strength: +d3.select("#control-lines-strength").property("value"), // strength of broad component
+    _width: +d3.select("#control-lines-width").property("value"), // width of broad component
     ndata: 25, // number of data points
     sigma: 0.075, // measurement error
     get strength() {

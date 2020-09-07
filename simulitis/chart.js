@@ -8,6 +8,7 @@ const d3 = Object.assign({},
   require("d3-timer"),
   require("d3-quadtree"));
 
+import { curveMovingAverage } from "../tools/CurveFactories";
 import { Vec } from "../tools/Vector";
 
 import React from "react";
@@ -90,6 +91,31 @@ export function create(el, props) {
 
   var size = 0.96 * d3.min([width / 2, height]);
 
+  // simulation parameters
+  var n = 100,
+      initialSpeed = 2,
+      radius = 5,
+      incubationTime = +d3.select("#control-simulitis-incubationTime").property("value"),
+      recoveryTime = +d3.select("#control-simulitis-recoveryTime").property("value"),
+      fatalityRate = +d3.select("#control-simulitis-fatalityRate").property("value"),
+      movementRate = +d3.select("#control-simulitis-movementRate").property("value"),
+      enableIsolation = false;
+
+  var data = [];
+
+  var xScale = d3.scaleLinear().range([0, size]),
+      yScale = d3.scaleLinear().range([size, 0.4 * size]);
+
+  var line = d3.line()
+    .x(d => xScale(d.x))
+    .y(d => yScale(d.y))
+    .curve(d3.curveLinear);
+
+  var smoothLine = d3.line()
+    .x(d => xScale(d.x))
+    .y(d => yScale(d.y))
+    .curve(curveMovingAverage.N(20));
+
   var svg = d3.select(el).append("svg")
     .attr("width", "100%")
     .attr("height", "100%")
@@ -97,18 +123,6 @@ export function create(el, props) {
     .attr("preserveAspectRatio", "xMidYMid meet")
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
-
-  // simulation parameters
-  var n = 100,
-      initialSpeed = 2,
-      radius = 5,
-      incubationTime = 3000,
-      recoveryTime = 3000,
-      fatalityRate = 0.01,
-      enableIsolation = false,
-      movementRate = 0.9;
-
-  var data = [];
 
   var simulationArea = svg.append("g");
 
@@ -123,24 +137,24 @@ export function create(el, props) {
 
   plotArea.append("g")
     .attr("class", "axis axis-y")
-    .attr("transform", `translate(${size},0)`);
+    .attr("transform", `translate(${size},0)`)
+  .append("text")
+    .attr("transform", `translate(0,${yScale.range()[1]})`)
+    .attr("alignment-baseline", "baseline")
+    .attr("dy", -10)
+    .text("N");
 
   plotArea.append("path")
-    .attr("class", "infected");
+    .attr("class", "sick raw");
 
   plotArea.append("path")
-    .attr("class", "sick");
+    .attr("class", "sick smooth");
 
   plotArea.append("path")
-    .attr("class", "healthy");
+    .attr("class", "healthy raw");
 
-  var xScale = d3.scaleLinear().range([0, size]),
-      yScale = d3.scaleLinear().range([size, 0.4 * size]);
-
-  var line = d3.line()
-    .x(d => xScale(d.x))
-    .y(d => yScale(d.y))
-    .curve(d3.curveLinear);
+  plotArea.append("path")
+    .attr("class", "healthy smooth");
 
   var randomProb = d3.randomUniform(0, 1),
       randomCoord = d3.randomUniform(0, size),
@@ -162,11 +176,7 @@ export function create(el, props) {
 
     // generate circle position and velocity
     d.pos = generatePosVec();
-    d.isMoving = (randomProb() < movementRate) || d.isInfected;
-    if (d.isMoving)
-      d.vel = generateVelVec();
-    else
-      d.vel = new Vec(0, 0);
+    d.vel = generateVelVec().scale(movementRate);
 
     d.infectionTime = 0;
     d.infectionCount = 0;
@@ -240,21 +250,13 @@ export function create(el, props) {
           }
     
           // update velocities
-          var eps = 0.0001;
-          if (d1.isMoving && d2.isMoving) {
-            var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius));
-            var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius));
-            d1.vel.minus(dvel1);
-            d2.vel.minus(dvel2);
-            d1.pos = pos.clone().plus(d1d2.clone().scale((1 + eps) * radius / separation)); // ensure separation after collision
-            d2.pos = pos.clone().minus(d1d2.clone().scale((1 + eps) * radius / separation));
-          } else if (d1.isMoving && !d2.isMoving) {
-            d1.vel.minus(d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius)).scale(2));
-            d1.pos.plus(d1d2.clone().scale((1 + eps) * radius / separation));
-          } else if (!d1.isMoving && d2.isMoving) {
-            d2.vel.minus(d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius)).scale(2));
-            d2.pos.plus(d2d1.clone().scale((1 + eps) * radius / separation));
-          }
+          var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius));
+          var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius));
+          d1.vel.minus(dvel1);
+          d2.vel.minus(dvel2);
+          var eps = 0.0001; // ensure separation after collision
+          d1.pos = pos.clone().plus(d1d2.clone().scale((1 + eps) * radius / separation));
+          d2.pos = pos.clone().minus(d1d2.clone().scale((1 + eps) * radius / separation));
         }
       }
 
@@ -284,8 +286,7 @@ export function create(el, props) {
     if (enableIsolation && d.isSick)
       return;
 
-    if (d.isMoving)
-      d.pos.plus(d.vel);
+    d.pos.plus(d.vel);
   }
 
   function restart() {
@@ -349,23 +350,23 @@ export function create(el, props) {
         totalSick = d3.sum(data, d => d.isSick),
         totalDead = d3.sum(data, d => d.isDead);
 
-    plotArea.select("path.healthy")
-      .datum().push({ x: t, y: n - totalInfected - totalDead });
+    plotArea.selectAll("path.healthy")
+      .datum(d => { d.push({ x: t, y: n - totalInfected - totalDead }); return d; });
 
-    plotArea.select("path.infected")
-      .datum().push({ x: t, y: totalInfected });
+    plotArea.selectAll("path.sick")
+      .datum(d => { d.push({ x: t, y: totalSick }); return d; });
 
-    plotArea.select("path.sick")
-      .datum().push({ x: t, y: totalSick });
-
-    plotArea.select("path.healthy")
+    plotArea.select("path.healthy.raw")
       .attr("d", line);
 
-    plotArea.select("path.infected")
+    plotArea.select("path.healthy.smooth")
+      .attr("d", smoothLine);
+
+    plotArea.select("path.sick.raw")
       .attr("d", line);
 
-    plotArea.select("path.sick")
-      .attr("d", line);
+    plotArea.select("path.sick.smooth")
+      .attr("d", smoothLine);
   }
 
   function classify(d) {

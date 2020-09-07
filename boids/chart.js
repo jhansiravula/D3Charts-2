@@ -64,9 +64,9 @@ export function create(el, props) {
 
   var n = 500;
 
-  var cohesionCoeff = 0.05,
-      alignmentCoeff = 0.05,
-      separationCoeff = 0.05,
+  var cohesionCoeff = +d3.select("#control-boids-cohesion").property("value"),
+      alignmentCoeff = +d3.select("#control-boids-alignment").property("value"),
+      separationCoeff = +d3.select("#control-boids-separation").property("value"),
       separationDistance = 30,
       neighborDistance = 60,
       maxVelocity = 2,
