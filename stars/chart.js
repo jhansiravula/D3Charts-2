@@ -81,20 +81,20 @@ export function create(el, props) {
       svg.select(".graticule")
         .attr("d", path);
 
-      var stars = svg.select(".stars").selectAll("circle")
-        .data(data.map(d => {
+      var stars = data.map(d => {
           var p = projection([-d.ra, d.dec]);
           d[0] = p[0], d[1] = p[1];
           return d;
-        }));
+        });
 
-      stars.enter().append("circle")
-        .attr("r", d => radius(d.magnitude))
-        .style("fill", d => color(d.color))
-        .attr("opacity", () => 0.5 * (1 + Math.random()))
-      .merge(stars)
-        .attr("cx", d => d[0])
-        .attr("cy", d => d[1]);
+      svg.select(".stars").selectAll("circle")
+        .data(stars)
+        .join("circle")
+          .attr("r", d => radius(d.magnitude))
+          .style("fill", d => color(d.color))
+          .attr("opacity", () => 0.5 * (1 + Math.random()))
+          .attr("cx", d => d[0])
+          .attr("cy", d => d[1]);
     }
 
     render();

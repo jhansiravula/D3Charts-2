@@ -319,17 +319,13 @@ export function create(el, props) {
 
     data.forEach(d => propagate(d, t));
 
-    var circles = simulationArea.selectAll("circle").data(data);
-
-    circles.enter().append("circle")
-      .attr("r", radius)
-    .merge(circles)
-      .attr("cx", d => d.pos.x)
-      .attr("cy", d => d.pos.y)
-      .attr("class", d => classify(d));
-
-    circles.exit()
-      .remove();
+    simulationArea.selectAll("circle")
+      .data(data)
+      .join("circle")
+        .attr("r", radius)
+        .attr("cx", d => d.pos.x)
+        .attr("cy", d => d.pos.y)
+        .attr("class", d => classify(d));
 
     var totalInfected = d3.sum(data, d => d.isInfected);
 

@@ -97,12 +97,12 @@ export function create(el, props) {
       acc: new Vec()
     });
 
-    boids.forEach(function(b1) {
+    boids.forEach(b1 => {
       var cohesionForce = new Vec(),
           alignmentForce = new Vec(),
           separationForce = new Vec();
 
-      boids.forEach(function(b2) {
+      boids.forEach(b2 => {
         if (b1 === b2) return;
 
         var separation = b2.pos.clone().minus(b1.pos),
@@ -126,23 +126,20 @@ export function create(el, props) {
       b1.pos.plus(b1.vel);
     });
 
-    var lines = svg.selectAll(".boid").data(boids);
-
-    lines.exit().remove();
-
-    lines.enter().append("path")
-      .attr("class", "boid")
-      .style("stroke", color(0))
-      .style("stroke-width", 2)
-    .merge(lines)
-      .style("stroke", b => color(b.vel.length()))
-      .attr("d", b => {
-        var v = b.vel.clone().normalize(20);
-        return line([
-          [b.pos.x - v.x / 2, b.pos.y - v.y / 2],
-          [b.pos.x + v.x / 2, b.pos.y + v.y / 2]
-        ]);
-      });
+    svg.selectAll(".boid")
+      .data(boids)
+      .join("path")
+        .attr("class", "boid")
+        .style("stroke", color(0))
+        .style("stroke-width", 2)
+        .style("stroke", b => color(b.vel.length()))
+        .attr("d", b => {
+          var v = b.vel.clone().normalize(20);
+          return line([
+            [b.pos.x - v.x / 2, b.pos.y - v.y / 2],
+            [b.pos.x + v.x / 2, b.pos.y + v.y / 2]
+          ]);
+        });
   }
 
   timer = d3.interval(tick, 20);

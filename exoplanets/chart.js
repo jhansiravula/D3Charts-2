@@ -104,26 +104,24 @@ export function create(el, props) {
         .on("change", function() { change(this.value); });
 
       function render() {
-        pack(root);
-
-        var node = nodes.selectAll("circle").data(root.children);
-
-        node.enter().append("circle")
-          .attr("class", "node")
-          .style("stroke", "black")
-          .style("stroke-width", 1)
-          .on("click", focus)
-          .on("mouseover", focus)
-        .merge(node)
-          .style("stroke-width", 1)
-          .style("fill", d => color(d.data.rho))
-          .transition().duration(750)
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y)
-          .attr("r", d => d.r);
-
         d3.selectAll(".info")
           .text("");
+          
+        pack(root);
+
+        nodes.selectAll("circle")
+          .data(root.children)
+          .join("circle")
+            .attr("class", "node")
+            .style("stroke", "black")
+            .style("stroke-width", 1)
+            .style("fill", d => color(d.data.rho))
+            .on("click", focus)
+            .on("mouseover", focus)
+            .transition().duration(750)
+              .attr("cx", d => d.x)
+              .attr("cy", d => d.y)
+              .attr("r", d => d.r);
       }
 
       function focus(event, d) {
@@ -137,13 +135,13 @@ export function create(el, props) {
           .text(d.data.name);
 
         svg.select(".info.radius")
-          .call(subscript, `Radius: ${number(d.data.radius, 2)} R`, "Jupiter");
+          .call(subscript, `Radius: ${numberFmt(d.data.radius, 2)} R`, "Jupiter");
 
         svg.select(".info.mass")
-          .call(subscript, `Mass: ${number(d.data.mass, 3)} M`, "Jupiter");
+          .call(subscript, `Mass: ${numberFmt(d.data.mass, 3)} M`, "Jupiter");
 
         svg.select(".info.separation")
-          .text(`Separation: ${number(d.data.separation, 2)} AU`);
+          .text(`Separation: ${numberFmt(d.data.separation, 2)} AU`);
       }
     })
     .catch(function() {
@@ -151,7 +149,7 @@ export function create(el, props) {
         .text("Failed to load data.");
     });
 
-  function number(x, p) {
+  function numberFmt(x, p) {
     return d3.format("." + p + "f")(x);
   }
 

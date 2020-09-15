@@ -80,27 +80,23 @@ export function create(el, props) {
     svg.select(".info")
       .text(`log(Z) = ${d3.format(".1f")(result.logz)}`);
 
-    var sample = svg.select(".samples").selectAll(".sample")
-      .data(result.samples);
+    svg.select(".samples").selectAll(".sample")
+      .data(result.samples)
+      .join("circle")
+        .attr("class", "sample")
+        .attr("cx", d => scale(d[0]))
+        .attr("cy", d => scale(d[1]))
+        .attr("r", 3)
+        .style("fill", color("sample"));
 
-    sample.enter().append("circle")
-      .attr("class", "sample")
-    .merge(sample)
-      .attr("cx", d => scale(d[0]))
-      .attr("cy", d => scale(d[1]))
-      .attr("r", 3)
-      .style("fill", color("sample"));
-
-    var point = svg.select(".points").selectAll(".point")
-      .data(result.active_points);
-
-    point.enter().append("circle")
-      .attr("class", "point")
-    .merge(point)
-      .attr("cx", d => scale(d[0]))
-      .attr("cy", d => scale(d[1]))
-      .attr("r", 3)
-      .style("fill", color("point"));
+    svg.select(".points").selectAll(".point")
+      .data(result.active_points)
+      .join("circle")
+        .attr("class", "point")
+        .attr("cx", d => scale(d[0]))
+        .attr("cy", d => scale(d[1]))
+        .attr("r", 3)
+        .style("fill", color("point"));
   }
 
   var tmax = 5 * Math.PI;

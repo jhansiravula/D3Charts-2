@@ -99,8 +99,8 @@ export function create(el, props) {
 
   Promise
     .all([
-      d3.csv(data_north_csv, row_north),
-      d3.csv(data_south_csv, row_south)
+      d3.csv(data_north_csv, (d, i) => row(d, i, "north")),
+      d3.csv(data_south_csv, (d, i) => row(d, i, "south"))
     ])
     .then(function([data_north, data_south]) {
       svg.select(".message")
@@ -130,11 +130,10 @@ export function create(el, props) {
 
         svg.selectAll(".line")
           .data(years.map(year => ({ year: year, data: region.map.get(year).entries() })))
-        .enter().append("path")
-          .attr("class", d => `line line-${d.year}`)
-        .merge(svg.selectAll(".line"))
-          .transition(t)
-          .attr("d", d => line(d.data));
+          .join("path")
+            .attr("class", d => `line line-${d.year}`)
+            .transition(t)
+            .attr("d", d => line(d.data));
       }
 
       change(d3.select("#control-seaice-region").select("input:checked").property("value"));
@@ -170,9 +169,6 @@ export function create(el, props) {
     d.region = region;
     return d;
   }
-
-  function row_north(d, i) { return row(d, i, "north"); }
-  function row_south(d, i) { return row(d, i, "south"); }
 }
 
 export function destroy() {}

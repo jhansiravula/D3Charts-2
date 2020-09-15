@@ -112,12 +112,12 @@ export function create(el, props) {
     .range([height, 0]);
 
   var line = d3.line()
-    .x(function(d) { return xscale(d[0]); })
-    .y(function(d) { return yscale(d[1]); });
+    .x(d => xscale(d[0]))
+    .y(d => yscale(d[1]));
 
   function linspace(domain, n) {
     var dx = (domain[1] - domain[0]) / (n - 1);
-    return d3.range(n).map(function(i) { return domain[0] + i * dx; });
+    return d3.range(n).map(i => domain[0] + i * dx);
   }
 
   function randspace(domain, n) {
@@ -125,9 +125,7 @@ export function create(el, props) {
   }
 
   function interpolate(f) {
-    return linspace(xscale.domain(), 200).map(function(x) {
-      return [x, f(x)];
-    });
+    return linspace(xscale.domain(), 200).map(x => [x, f(x)]);
   }
 
   var state = {
@@ -198,25 +196,23 @@ export function create(el, props) {
   }
 
   function updateLines(selection, data) {
-    var lines = selection.selectAll(".line").data(data.map(v => {
-      return interpolate(function(x) {
+    var lines = data.map(v => {
+      return interpolate(x => {
         if (v.length === 4) {
           return v[0] + v[1] * f(x - v[2], v[3]);
         } else if (v.length === 6) {
           return v[0] + v[1] * f(x - v[2], v[3]) + v[4] * f(x - v[2], v[5]);
         }
       })
-    }));
+    });
 
-    lines.enter().append("path")
-      .attr("class", "line")
-      .style("stroke-width", 1)
-      .style("stroke-opacity", 0.2)
-    .merge(lines)
-      .attr("d", line);
-
-    lines.exit()
-      .remove();
+    selection.selectAll(".line")
+      .data(lines)
+      .join("path")
+        .attr("class", "line")
+        .style("stroke-width", 1)
+        .style("stroke-opacity", 0.2)
+        .attr("d", line);
   }
 
   function prior_uniform(x, a, b) {
@@ -245,9 +241,9 @@ export function create(el, props) {
 
   function loglikelihood(v) {
     if (v.length === 4) {
-      var dy = state.data.map(function(d) { return (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]))) / state.sigma; });
+      var dy = state.data.map(d => (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]))) / state.sigma);
     } else if (v.length === 6) {
-      var dy = state.data.map(function(d) { return (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]) + v[4] * f(d[0] - v[2], v[5]))) / state.sigma; });
+      var dy = state.data.map(d => (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]) + v[4] * f(d[0] - v[2], v[5]))) / state.sigma);
     }
 
     return -numeric.sum(numeric.pow(dy, 2)) / 2;
