@@ -52,7 +52,9 @@ export function create(el, props) {
 
   svg.append("path")
     .attr("fill", "none")
-    .attr("stroke", "black");
+    .attr("stroke", "black")
+    .attr("stroke-width", 1)
+    .attr("stroke-opacity", 0.2);
 
   var turn = 0.5 * Math.PI;
 
@@ -109,19 +111,12 @@ export function create(el, props) {
       yScale.domain([(y1 + y0) / 2 - (x1 - x0) / 2 / aspect, (y1 + y0) / 2 + (x1 - x0) / 2 / aspect]);
     }
 
-    var path = svg.select("path")
-      .datum(data)
-      .attr("stroke-width", 1)
-      .attr("stroke-opacity", 0.2)
-      .attr("d", line);
-
-    var totalLength = path.node().getTotalLength();
-
-    path
-      .attr("stroke-dasharray", totalLength)
-      .attr("stroke-dashoffset", totalLength)
+    svg.select("path")
       .transition().duration(5000).ease(d3.easeCubic)
-      .attr("stroke-dashoffset", 0);
+      .attrTween("d", function() {
+        var interpolate = d3.scaleQuantile().domain([0, 1]).range(d3.range(1, data.length + 1));
+        return t => line(data.slice(0, interpolate(t)));
+      });
   }
 
   d3.json(dataSrc).then(function(counts) {
