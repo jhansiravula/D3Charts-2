@@ -41,7 +41,7 @@ export function create(el, props) {
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-  var years = d3.range(1978, 2021);
+  var years = d3.range(1978, 2022);
 
   var x = d3.scaleLinear().domain([0, 365]).range([0, width]),
       y = d3.scaleLinear().range([height, 0]),
