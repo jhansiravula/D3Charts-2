@@ -14,8 +14,8 @@ export const id = "vg250";
 export const name = "Population Density";
 export const readme = "The population density of counties in Germany (2018).";
 export const sources = [
-  { url: "https://bkg.bund.de", description: "Bundesamt für kartographie und Geodäsie" },
-  { url: "https://ec.europa.eu/eurostat", description: "eurostat" }
+  { url: "https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-ebenen-stand-01-01-vg250-ebenen-01-01.html", description: "Verwaltungsgebiete 1:250000, ©GeoBasis-DE/BK (2020), dl-de/by-2-0" },
+  { url: "https://ec.europa.eu/eurostat/de/web/products-datasets/product?code=demo_r_d3dens", description: "eurostat" }
 ];
 
 export function controls() {}
