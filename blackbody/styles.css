@@ -1,0 +1,7 @@
+.curve { fill: none; stroke-width: 3px; }
+.filling { fill: #d62728; fill-opacity: 0.1; }
+
+.planck { stroke: #d62728; }
+.wien { stroke: #1f77b4; }
+.jeans { stroke: #1f77b4; }
+.peak { stroke: #d62728; stroke-dasharray: 5,5; }
