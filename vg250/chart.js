@@ -38,17 +38,17 @@ export function create(el, props) {
     .range(d3.schemeYlGn[8]);
 
   // draw legend
-  
+
   var legendScale = d3.scaleLinear()
     .domain([0, 5000])
     .range([0, 300]);
-  
+
   var legendAxis = d3.axisBottom()
     .scale(legendScale)
     .tickSize(12)
     .tickValues(color.domain())
     .tickFormat(function(d) { return d >= 500 ? d : null; });
-  
+
   var legend = svg.append("g");
 
   legend.selectAll("rect")
@@ -62,7 +62,7 @@ export function create(el, props) {
       .attr("x", d => d.x0)
       .attr("width", d => d.x1 - d.x0)
       .style("fill", d => d.color);
-  
+
   legend.call(legendAxis)
     .append("text")
       .attr("y", -6)
@@ -75,7 +75,7 @@ export function create(el, props) {
     .then(function(topo) {
 
       // draw info box
-  
+
       var info = svg.append("text")
         .attr("transform", "translate(10, 100)")
         .selectAll("tspan")
@@ -88,12 +88,10 @@ export function create(el, props) {
 
       // draw map
 
-      var path = d3.geoPath();
-
       var map = svg.append("g").selectAll("path")
         .data(topojson.feature(topo, topo.objects.counties).features)
         .join("path")
-          .attr("d", path)
+          .attr("d", d3.geoPath())
           .style("stroke", "black")
           .style("stroke-width", 0.5)
           .style("fill", d => color(d.properties.value))
@@ -105,7 +103,6 @@ export function create(el, props) {
         d3.select(this).style("stroke-width", 2);
 
         info.each(function(label) {
-
           switch (label) {
             case "name":
               d3.select(this).text(d.properties.name);
@@ -118,7 +115,7 @@ export function create(el, props) {
               break;
           };
         });
-      };
+      }
     });
 }
 
