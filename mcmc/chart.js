@@ -42,17 +42,13 @@ export function create(el, props) {
   var width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-  var size = height;
-
   var svg = d3.select(el).append("svg")
     .attr("width", "100%")
     .attr("height", "100%")
     .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
   .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`)
-  .append("g")
-    .attr("transform", `translate(${(width - size)/2},0)`);
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
   svg.append("defs")
     .append("clipPath")
@@ -60,23 +56,17 @@ export function create(el, props) {
       .append("rect")
       .attr("x", 0)
       .attr("y", 0)
-      .attr("width", size)
-      .attr("height", size);
+      .attr("width", width)
+      .attr("height", height);
 
   svg.append("rect")
-    .attr("width", size)
-    .attr("height", size)
+    .attr("width", width)
+    .attr("height", height)
     .style("fill", "white")
     .style("stroke", "none");
 
   svg.append("g").attr("clip-path", "url(#def-mcmc-clipPath)")
     .attr("class", "hexbins");
-
-  svg.append("rect")
-    .attr("width", size)
-    .attr("height", size)
-    .style("fill", "none")
-    .style("stroke", "black");
 
   svg.append("g").attr("clip-path", "url(#def-mcmc-clipPath)")
     .attr("class", "contours");
@@ -97,12 +87,12 @@ export function create(el, props) {
     .x(d => projection([x2grid(d[0]), y2grid(d[1])])[0])
     .y(d => projection([x2grid(d[0]), y2grid(d[1])])[1])
     .radius(5)
-    .extent([[0, 0], [size, size]])
+    .extent([[0, 0], [width, height]])
 
   var color = d3.scaleSequential(d3.interpolateYlGn);
 
   var data = {
-    rosenbrock: { x0: -2.5, x1: 2.5, y0: 1-2.5, y1: 1+2.5, z: [-60, -30, -20, -10],
+    rosenbrock: { x0: -2, x1: 2, y0: -2, y1: 3, z: [-60, -30, -20, -10],
       lnprobfn: d => -(100 * Math.pow(d[1] - d[0]*d[0], 2) + Math.pow(d[0] - 1, 2)) },
     booth: { x0: 1-4, x1: 1+4, y0: 3-4, y1: 3+4, z: [-20, -15, -10, -5],
       lnprobfn: d => -(Math.pow(d[0] + 2 * d[1] - 7, 2) + Math.pow(2 * d[0] + d[1] - 5, 2)) }
@@ -143,7 +133,7 @@ export function create(el, props) {
       .thresholds(d.z)
       (values);
 
-    projection.fitSize([size, size], contours[0]);
+    projection.fitSize([width, height], contours[0]);
 
     svg.select(".contours").selectAll(".contour")
       .data(contours.slice(1))
