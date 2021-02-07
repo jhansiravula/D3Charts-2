@@ -111,10 +111,13 @@ export function create(el, props) {
     .y(d => yScale(d.y))
     .curve(d3.curveLinear);
 
+  var smoothWindow = 20;
+  var rawLine = d => d.length > smoothWindow ? line(d.slice(smoothWindow/2)) : null;
+
   var smoothLine = d3.line()
     .x(d => xScale(d.x))
     .y(d => yScale(d.y))
-    .curve(curveMovingAverage.N(20));
+    .curve(curveMovingAverage.N(smoothWindow));
 
   var svg = d3.select(el).append("svg")
     .attr("width", "100%")
@@ -353,13 +356,13 @@ export function create(el, props) {
       .datum(d => { d.push({ x: t, y: totalSick }); return d; });
 
     plotArea.select("path.healthy.raw")
-      .attr("d", line);
+      .attr("d", rawLine);
 
     plotArea.select("path.healthy.smooth")
       .attr("d", smoothLine);
 
     plotArea.select("path.sick.raw")
-      .attr("d", line);
+      .attr("d", rawLine);
 
     plotArea.select("path.sick.smooth")
       .attr("d", smoothLine);
