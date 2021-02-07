@@ -8,7 +8,7 @@ const d3 = Object.assign({},
   require("d3-axis"),
   require("d3-hexbin"));
 
-import emcee from "../tools/emcee";
+import MCMC from "../tools/MCMC";
 
 import React from "react";
 import { Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
@@ -19,6 +19,8 @@ export const readme = "Affine invariant MCMC sampling is a popular algorithm for
 export const sources = [
   { url: "https://github.com/dfm/emcee.js", description: "emcee.js (D. Foreman-Mackey)" }
 ];
+
+var sampling;
 
 export function controls() {
   return (
@@ -34,7 +36,7 @@ export function controls() {
 }
 
 export function create(el, props) {
-  emcee.delay = 100;
+  MCMC.delay = 100;
 
   var margin = { top: 20, right: 10, bottom: 20, left: 10 };
   var width = 960 - margin.left - margin.right,
@@ -82,8 +84,9 @@ export function create(el, props) {
   svg.append("g").attr("clip-path", "url(#def-mcmc-clipPath)")
     .attr("class", "walkers")
 
+  sampling = $.Deferred();
+
   var xc, yc, lnprobfn;
-  var sampling = $.Deferred();
   var projection = d3.geoIdentity();
 
   var ngrid = 100;
@@ -115,7 +118,7 @@ export function create(el, props) {
 
     var d = data[value];
 
-    xc = 0; yc = 0;
+    xc = 0; yc = 1;
     lnprobfn = d.lnprobfn;
 
     // redraw contours
@@ -150,7 +153,7 @@ export function create(el, props) {
         .attr("stroke", "#C0C0C0")
         .attr("d", d3.geoPath(projection));
 
-    restart()
+    restart();
   }
 
   function restart() {
@@ -165,11 +168,14 @@ export function create(el, props) {
 
     var initialPosition = d3.range(nwalkers).map(() => [xc + (Math.random() - 0.5), yc + (Math.random() - 0.5)]);
 
-    sampling = emcee.sample(lnprobfn, initialPosition, niter)
+    sampling = MCMC.sample(lnprobfn, initialPosition, niter)
       .progress(result => render(result))
   }
 
   function render(result) {
+
+    // redraw walkers
+
     svg.select(".walkers").selectAll(".walker")
       .data(result.iteration)
       .join("circle")
@@ -179,6 +185,8 @@ export function create(el, props) {
         .attr("stroke", "none")
         .attr("cx", d => projection([x2grid(d[0]), y2grid(d[1])])[0])
         .attr("cy", d => projection([x2grid(d[0]), y2grid(d[1])])[1])
+
+    // rewdraw hexbins
 
     var bins = hexbin(result.chain);
     color.domain([0, d3.max(bins, d => d.length)]);
@@ -213,4 +221,6 @@ export function create(el, props) {
 
 };
 
-export function destroy() {}
+export function destroy() {
+  if (typeof sampling !== "undefined") sampling.reject();
+}

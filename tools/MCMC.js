@@ -2,13 +2,13 @@
 
 import { interval } from "d3-timer";
 
-var emcee = {};
+var MCMC = {};
 
-emcee.delay = 0.; // slow down iteration (for visualization)
+MCMC.delay = 0; // slow down iteration (for visualization)
 
 var SAMPLERS = { ensemble: EnsembleSampler };
 
-emcee.sample = function(loglikelihood, initialPosition, niter, method) {
+MCMC.sample = function(loglikelihood, initialPosition, niter, method) {
   if (typeof method === "undefined")
     method = "ensemble";
 
@@ -26,7 +26,7 @@ emcee.sample = function(loglikelihood, initialPosition, niter, method) {
 
     i++;
     if (i > niter) iteration.resolve();
-  }, emcee.delay);
+  }, MCMC.delay);
 
   iteration.done(function() {
     timer.stop();
@@ -103,4 +103,4 @@ EnsembleSampler.prototype.getFlatChain = function() {
   return result;
 };
 
-export default emcee;
+export default MCMC;
