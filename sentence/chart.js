@@ -27,7 +27,7 @@ export function controls() {
   return (
     <Form style={{marginTop: 20}}>
       <Form.Group style={{textAlign: "center"}}>
-        <ToggleButtonGroup id="control-sentence-text" type="radio" name="text" defaultValue="pg174.txt" size="sm">      
+        <ToggleButtonGroup id="control-sentence-text" type="radio" name="text" defaultValue="pg174.txt" size="sm">
           <ToggleButton variant="light" value="pg174.txt">The Picture of Dorian Gray</ToggleButton>
           <ToggleButton variant="light" value="pg1260.txt">Jane Eyre</ToggleButton>
           <ToggleButton variant="light" value="pg1400.txt">Great Expectations</ToggleButton>

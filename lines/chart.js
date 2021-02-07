@@ -38,18 +38,18 @@ export function controls() {
         <Form.Label column md={4}>
           Strength of broad component
         </Form.Label>
-        <Col md={4} style={{paddingTop: 5}}>        
+        <Col md={4} style={{paddingTop: 5}}>
           <input id="control-lines-strength" type="range" min="0" max="0.5" defaultValue="0.4" step="0.01"/>
         </Col>
-      </Form.Group>  
+      </Form.Group>
       <Form.Group as={Row}>
         <Form.Label column md={4}>
           Width of broad component
         </Form.Label>
-        <Col md={4} style={{paddingTop: 5}}>        
+        <Col md={4} style={{paddingTop: 5}}>
           <input id="control-lines-width" type="range" min="1" max="3" defaultValue="2.6" step="0.01"/>
         </Col>
-      </Form.Group>                  
+      </Form.Group>
     </Form>
   );
 }

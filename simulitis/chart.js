@@ -53,7 +53,7 @@ export function controls() {
               <Form.Label column xs={4}>
                 Recovery Time
               </Form.Label>
-              <Col xs={6} style={{paddingTop: 5}}>        
+              <Col xs={6} style={{paddingTop: 5}}>
                 <input id="control-simulitis-recoveryTime" type="range" min="1000" max="9000" defaultValue="3000" step="100"/>
               </Col>
             </Form.Group>
@@ -73,7 +73,7 @@ export function controls() {
               <Form.Label column xs={4}>
                 Fatality Rate
               </Form.Label>
-              <Col xs={6} style={{paddingTop: 5}}>        
+              <Col xs={6} style={{paddingTop: 5}}>
                 <input id="control-simulitis-fatalityRate" type="range" min="0" max="1" defaultValue="0.01" step="0.01"/>
               </Col>
             </Form.Group>
@@ -171,7 +171,7 @@ export function create(el, props) {
 
   function generateCircle(isInfected) {
     var d = {};
-    
+
     d.isInfected = isInfected;
 
     // generate circle position and velocity
@@ -219,21 +219,21 @@ export function create(el, props) {
       if (node.data) {
         // this is leaf node
         var d2 = node.data;
-    
+
         if (d1 === d2)
           return;
-    
+
         if (d1.isDead || d2.isDead)
           return; // exclude dead circles from interactions
-    
+
         if (enableIsolation && (d1.isSick || d2.isSick))
           return;
-    
+
         var pos = d1.pos.clone().plus(d2.pos).scale(0.5), // midpoint
             d1d2 = d1.pos.clone().minus(d2.pos),
             d2d1 = d1d2.clone().scale(-1),
             separation = d1d2.length();
-    
+
         if (separation < 2 * radius) {
           if ((d1.isSick && d2.isSick) || d1.isRecovered || d2.isRecovered) {
             // sick or recovered circles can not be infected again
@@ -248,7 +248,7 @@ export function create(el, props) {
             d1.infectionTime = t;
             d2.infectionCount += 1;
           }
-    
+
           // update velocities
           var dvel1 = d1d2.clone().scale(d1.vel.clone().minus(d2.vel).dot(d1d2) / (4 * radius * radius));
           var dvel2 = d2d1.clone().scale(d2.vel.clone().minus(d1.vel).dot(d2d1) / (4 * radius * radius));

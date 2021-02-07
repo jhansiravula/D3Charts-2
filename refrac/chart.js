@@ -38,7 +38,7 @@ export function controls() {
         <Form.Label column md={3}>
           Angle of incidence
         </Form.Label>
-        <Col md={6} style={{paddingTop: 5}}>        
+        <Col md={6} style={{paddingTop: 5}}>
           <input className="control" id="control-refrac-a" type="range" min={amin} max={amax} defaultValue={Math.PI / 8} step="0.01"/>
         </Col>
       </Form.Group>
@@ -46,7 +46,7 @@ export function controls() {
         <Form.Label column md={3}>
           Refractive Index
         </Form.Label>
-        <Col md={6} style={{paddingTop: 5}}>        
+        <Col md={6} style={{paddingTop: 5}}>
           <input className="control" id="control-refrac-n" type="range" min="0.01" max="3" defaultValue="1.5" step="0.01"/>
         </Col>
       </Form.Group>
@@ -55,7 +55,7 @@ export function controls() {
           Polarization
         </Form.Label>
         <Col md={6} style={{paddingTop: 5}}>
-          <ToggleButtonGroup id="control-refrac-pol" type="radio" name="pol" defaultValue="s" size="sm">      
+          <ToggleButtonGroup id="control-refrac-pol" type="radio" name="pol" defaultValue="s" size="sm">
             <ToggleButton variant="light" value="s">Perpendicular</ToggleButton>
             <ToggleButton variant="light" value="p">Parallel</ToggleButton>
           </ToggleButtonGroup>
@@ -284,7 +284,7 @@ export function create(el, props) {
     .on("end", function() {
       d3.selectAll(".control")
         .attr("disabled", null);
-        
+
       updateChart();
 
       svg.select(".surface")

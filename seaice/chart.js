@@ -26,7 +26,7 @@ export function controls() {
   return (
     <Form style={{marginTop: 20}}>
       <Form.Group style={{textAlign: "center"}}>
-        <ToggleButtonGroup id="control-seaice-region" type="radio" name="region" defaultValue="north" size="sm">      
+        <ToggleButtonGroup id="control-seaice-region" type="radio" name="region" defaultValue="north" size="sm">
           <ToggleButton variant="light" value="north">Arctic Sea Ice (NH)</ToggleButton>
           <ToggleButton variant="light" value="south">Antarctic Sea Ice (SH)</ToggleButton>
           <ToggleButton variant="light" value="global">Global Sea Ice</ToggleButton>

@@ -37,7 +37,7 @@ export function controls() {
         <Form.Label column md={2}>
           Speed
         </Form.Label>
-        <Col md={3} style={{paddingTop: 5}}>        
+        <Col md={3} style={{paddingTop: 5}}>
           <input id="control-clt-speed" type="range" min="0" max="1" defaultValue="0" step="0.01"/>
         </Col>
       </Form.Group>

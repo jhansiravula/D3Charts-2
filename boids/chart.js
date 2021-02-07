@@ -28,7 +28,7 @@ export function controls() {
         <Form.Label column md={2}>
           Cohesion Force
         </Form.Label>
-        <Col md={2} style={{paddingTop: 5}}>     
+        <Col md={2} style={{paddingTop: 5}}>
           <input id="control-boids-cohesion" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
       </Form.Group>
@@ -36,7 +36,7 @@ export function controls() {
         <Form.Label column md={2}>
           Alignment Force
         </Form.Label>
-        <Col md={2} style={{paddingTop: 5}}>   
+        <Col md={2} style={{paddingTop: 5}}>
           <input id="control-boids-alignment" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
       </Form.Group>
@@ -44,10 +44,10 @@ export function controls() {
         <Form.Label column md={2}>
           Separation Force
         </Form.Label>
-        <Col md={2} style={{paddingTop: 5}}>    
+        <Col md={2} style={{paddingTop: 5}}>
           <input id="control-boids-separation" type="range" min="0" max="0.1" defaultValue="0.05" step="0.01"/>
         </Col>
-      </Form.Group>            
+      </Form.Group>
     </Form>
   );
 }

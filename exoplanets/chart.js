@@ -23,7 +23,7 @@ export function controls() {
   return (
     <Form style={{marginTop: 20}}>
       <Form.Group style={{textAlign: "center"}}>
-       <ToggleButtonGroup id="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="undefined" size="sm">      
+       <ToggleButtonGroup id="control-exoplanets-sorting" type="radio" name="sorting" defaultValue="undefined" size="sm">
          <ToggleButton variant="light" value="undefined">No sorting</ToggleButton>
          <ToggleButton variant="light" value="radius">Sort by radius</ToggleButton>
          <ToggleButton variant="light" value="mass">Sort by mass</ToggleButton>
@@ -106,7 +106,7 @@ export function create(el, props) {
       function render() {
         d3.selectAll(".info")
           .text("");
-          
+
         pack(root);
 
         nodes.selectAll("circle")
@@ -159,7 +159,7 @@ export function create(el, props) {
 
     selection.append("tspan")
       .text(text);
-      
+
     selection.append("tspan")
       .attr("baseline-shift", "sub")
       .style("font-size", "60%")
