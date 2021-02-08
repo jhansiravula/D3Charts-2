@@ -40,135 +40,147 @@ export function create(el, props) {
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  var x = d3.scaleLinear().range([0, width]),
-      y = d3.scaleLinear().range([height, 0]),
-      aspect = width / height;
+  svg.append("text")
+    .attr("class", "message")
+    .attr("alignment-baseline", "hanging")
+    .text("Loading data ...");
 
-  var background = svg.append("g"),
-      foreground = svg.append("g");
+  d3.json(dataSrc)
+    .then(function(orbits) {
+      svg.select(".message")
+        .remove();
 
-  background.append("ellipse")
-    .attr("class", "circle");
+      var x = d3.scaleLinear().range([0, width]),
+          y = d3.scaleLinear().range([height, 0]),
+          aspect = width / height;
 
-  background.append("circle")
-    .attr("class", "origin");
+      var background = svg.append("g"),
+          foreground = svg.append("g");
 
-  var traces = [];
+      background.append("ellipse")
+        .attr("class", "circle");
 
-  d3.json(dataSrc).then(function(orbits) {
-    function render(id) {
-      var orbit = orbits[id];
+      background.append("circle")
+        .attr("class", "origin");
 
-      var P = OrbitalMechanics.period(orbit, mu);
-      var t0 = orbit.t0 - P / 2,
-        dt = P / 100,
-        time = d3.range(t0, t0 + P + dt, dt),
-        points = time.map(t => {
-          var p = OrbitalMechanics.oe2rv({
-            a: orbit.a,
-            e: orbit.e,
-            inc: orbit.inc,
-            Omega: orbit.Omega,
-            omega: orbit.omega,
-            M: OrbitalMechanics.meanMotion(orbit, mu) * (t - orbit.t0)
-          }, mu);
-          return [-p.y, p.x];
-        });
+      var traces = [];
 
-      var [xmin, xmax] = d3.extent(points, d => d[0]);
-      var [ymin, ymax] = d3.extent(points, d => d[1]);
+      function render(id) {
+        var orbit = orbits[id];
 
-      if (ymax - ymin > (xmax - xmin) / aspect) {
-        x.domain([(xmax + xmin) / 2 - (ymax - ymin) / 2 * aspect, (xmax + xmin) / 2 + (ymax - ymin) / 2 * aspect]);
-        y.domain([ymin, ymax]);
-      } else {
-        x.domain([xmin, xmax]);
-        y.domain([(ymax + ymin) / 2 - (xmax - xmin) / 2 / aspect, (ymax + ymin) / 2 + (xmax - xmin) / 2 / aspect]);
+        var P = OrbitalMechanics.period(orbit, mu);
+        var t0 = orbit.t0 - P / 2,
+          dt = P / 100,
+          time = d3.range(t0, t0 + P + dt, dt),
+          points = time.map(t => {
+            var p = OrbitalMechanics.oe2rv({
+              a: orbit.a,
+              e: orbit.e,
+              inc: orbit.inc,
+              Omega: orbit.Omega,
+              omega: orbit.omega,
+              M: OrbitalMechanics.meanMotion(orbit, mu) * (t - orbit.t0)
+            }, mu);
+            return [-p.y, p.x];
+          });
+
+        var [xmin, xmax] = d3.extent(points, d => d[0]);
+        var [ymin, ymax] = d3.extent(points, d => d[1]);
+
+        if (ymax - ymin > (xmax - xmin) / aspect) {
+          x.domain([(xmax + xmin) / 2 - (ymax - ymin) / 2 * aspect, (xmax + xmin) / 2 + (ymax - ymin) / 2 * aspect]);
+          y.domain([ymin, ymax]);
+        } else {
+          x.domain([xmin, xmax]);
+          y.domain([(ymax + ymin) / 2 - (xmax - xmin) / 2 / aspect, (ymax + ymin) / 2 + (xmax - xmin) / 2 / aspect]);
+        }
+
+        background.select(".circle")
+          .attr("cx", x(0))
+          .attr("cy", y(0))
+          .attr("rx", x(250) - x(0))
+          .attr("ry", y(0) - y(250));
+
+        background.select(".origin")
+          .attr("cx", x(0))
+          .attr("cy", y(0))
+          .attr("r", 5);
+
+        var line = d3.line()
+          .x(d => x(d[0]))
+          .y(d => y(d[1]))
+          .curve(d3.curveBasis);
+
+        traces.push({ cx0: x(0), cy0: y(0), rx0: x(250) - x(0), ry0: y(0) - y(250) });
+
+        background.selectAll(".trace")
+          .data(traces)
+          .join(
+            enter => enter.append("path")
+              .attr("class", "trace")
+              .style("stroke-width", 8)
+              .call(enter => enter.transition()
+                .duration(2500).ease(d3.easeLinear)
+                .attrTween("d", function() {
+                  var interpolate = d3.scaleQuantile().domain([0, 1]).range(d3.range(1, points.length + 1));
+                  return t => line(points.slice(0, interpolate(t)));
+                })
+              ),
+            update => update
+              .interrupt()
+              .each(function(d) {
+                var dx = x(0) - d.cx0, sx = (x(250) - x(0)) / d.rx0,
+                    dy = y(0) - d.cy0, sy = (y(0) - y(250)) / d.ry0; // = sx
+                d3.select(this).attr("transform", `translate(${-x(0)*(sx-1)},${-y(0)*(sy-1)}) scale(${sx},${sy}) translate(${dx},${dy})`);
+                d3.select(this).style("stroke-width", 8 / sx);
+              })
+          );
       }
 
-      background.select(".circle")
-        .attr("cx", x(0))
-        .attr("cy", y(0))
-        .transition().duration(1000)
-        .attr("rx", x(250) - x(0))
-        .attr("ry", y(0) - y(250));
+      var defaultId = "S2";
 
-      background.select(".origin")
-        .attr("cx", x(0))
-        .attr("cy", y(0))
-        .attr("r", 5);
+      var simulation = d3.forceSimulation()
+        .force("collision", d3.forceCollide().radius(d => d.r + 1));
 
-      var line = d3.line()
-        .x(d => x(d[0]))
-        .y(d => y(d[1]))
-        .curve(d3.curveBasis);
+      var nodes = d3.entries(orbits);
+      nodes.forEach(d => d.r = 35 - d.value.mag);
 
-      traces.push({ cx0: x(0), cy0: y(0), rx0: x(250) - x(0), ry0: y(0) - y(250) });
+      var color = d3.scaleOrdinal()
+        .domain(["early-type", "late-type"])
+        .range(["#1f77b4", "#d62728"]);
 
-      var trace = background.selectAll(".trace")
-        .data(traces);
+      var node = foreground.selectAll(".node")
+        .data(nodes)
+        .join("g")
+          .attr("class", "node");
 
-      trace.interrupt();
+      node.append("circle")
+        .attr("r", d => d.r)
+        .style("fill", d => color(d.value.type))
+        .attr("opacity", d => d.key == defaultId ? 1 : 0.66);
 
-      trace.enter().append("path")
-        .attr("class", "trace")
-        .style("stroke-width", 8)
-        .transition().duration(2500).ease(d3.easeLinear)
-        .attrTween("d", function() {
-          var interpolate = d3.scaleQuantile().domain([0, 1]).range(d3.range(1, points.length + 1));
-          return t => line(points.slice(0, interpolate(t)));
+      node.append("text")
+        .attr("text-anchor", "middle")
+        .attr("y", ".3em")
+        .text(d => d.key);
+
+      node.on("click", function(event, d) {
+        d3.select(this).select("circle").attr("opacity", 1);
+        render(d.key);
+      });
+
+      simulation
+        .nodes(nodes)
+        .on("tick", function() {
+          node.attr("transform", d => `translate(${200 + d.x},${(200 + d.y)})`);
         });
 
-      trace.each(function(d) {
-        var dx = x(0) - d.cx0,
-            dy = y(0) - d.cy0,
-            sx = (x(250) - x(0)) / d.rx0,
-            sy = (y(0) - y(250)) / d.ry0; // = sx
-
-        d3.select(this).attr("transform", `translate(${-x(0)*(sx-1)},${-y(0)*(sy-1)}) scale(${sx},${sy}) translate(${dx},${dy})`);
-        d3.select(this).style("stroke-width", 8 / sx);
-      });
-    }
-
-    var simulation = d3.forceSimulation()
-      .force("collision", d3.forceCollide().radius(d => d.r + 1));
-
-    var nodes = d3.entries(orbits);
-    nodes.forEach(d => d.r = 35 - d.value.mag);
-
-    var color = d3.scaleOrdinal()
-      .domain(["early-type", "late-type"])
-      .range(["#1f77b4", "#d62728"]);
-
-    var node = foreground.selectAll(".node")
-      .data(nodes)
-    .enter()
-      .append("g")
-      .attr("class", "node");
-
-    node.append("circle")
-      .attr("r", d => d.r)
-      .style("fill", d => color(d.value.type))
-      .attr("opacity", d => d.key == "S2" ? 1 : 0.66);
-
-    node.append("text")
-      .attr("text-anchor", "middle")
-      .attr("y", ".3em")
-      .text(d => d.key);
-
-    node.on("click", function(event, d) {
-      d3.select(this).select("circle").attr("opacity", 1);
-      render(d.key);
+      render(defaultId);
+    })
+    .catch(function() {
+      svg.select(".message")
+        .text("Failed to load data.");
     });
-
-    simulation
-      .nodes(nodes)
-      .on("tick", function() {
-        node.attr("transform", d => `translate(${200 + d.x},${(200 + d.y)})`);
-      });
-
-    render("S2");
-  });
 }
 
 export function destroy() {}

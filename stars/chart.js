@@ -26,111 +26,125 @@ export function create(el, props) {
   var width = 960,
       height = 500;
 
-  var projection = d3.geoStereographic()
-    .scale(400)
-    .clipAngle(120)
-    .translate([width / 2, height / 2]);
-
-  var path = d3.geoPath()
-    .projection(projection);
-
-  var graticule = d3.geoGraticule();
-
-  var lambda = d3.scaleLinear()
-    .domain([0, width])
-    .range([-180, 180]);
-
-  var phi = d3.scaleLinear()
-    .domain([0, height])
-    .range([90, -90]);
-
-  var radius = d3.scaleLinear()
-    .domain([-1, 5])
-    .range([8, 1]);
-
-  var color = d3.scaleLinear()
-    .domain([-0.2, 0.5, 1.6])
-    .range(["#e6f0ff", "#ffffff", "fff5e6"])
-    .clamp(true);
-
-  var svg = d3.select(el).append("svg")
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .attr("viewBox", `0 0 ${width} ${height}`)
-    .attr("preserveAspectRatio", "xMidYMid meet");
+   var svg = d3.select(el).append("svg")
+     .attr("width", "100%")
+     .attr("height", "100%")
+     .attr("viewBox", `0 0 ${width} ${height}`)
+     .attr("preserveAspectRatio", "xMidYMid meet");
 
   svg.append("rect")
     .attr("width", "100%")
     .attr("height", "100%")
     .style("fill", "black");
 
-  svg.append("path")
-    .datum(graticule())
-    .attr("class", "graticule")
-    .style("fill", "none")
-    .style("stroke", "white")
-    .style("stroke-opacity", 0.2);
+  svg.append("text")
+    .attr("class", "message")
+    .attr("alignment-baseline", "hanging")
+    .attr("dx", 10)
+    .attr("dy", 10)
+    .attr("fill", "#ffffff")
+    .text("Loading data ...");
 
-  svg.append("g")
-    .attr("class", "stars")
-    .style("fill", "white")
-    .style("stroke", "black");
+  d3.csv(dataSrc, row)
+    .then(function(data) {
+      svg.select(".message")
+        .remove();
 
-  d3.csv(dataSrc, row).then(function(data) {
-    function render() {
-      svg.select(".graticule")
-        .attr("d", path);
+      svg.append("path")
+        .datum(d3.geoGraticule()())
+        .attr("class", "graticule")
+        .style("fill", "none")
+        .style("stroke", "white")
+        .style("stroke-opacity", 0.2);
 
-      var stars = data.map(d => {
-          var p = projection([-d.ra, d.dec]);
-          d[0] = p[0], d[1] = p[1];
-          return d;
-        });
+      svg.append("g")
+        .attr("class", "stars")
+        .style("fill", "white")
+        .style("stroke", "black");
+
+      var projection = d3.geoStereographic()
+        .scale(400)
+        .clipAngle(120)
+        .translate([width / 2, height / 2]);
+
+      var path = d3.geoPath()
+        .projection(projection);
+
+      var lambda = d3.scaleLinear()
+        .domain([0, width])
+        .range([-180, 180]);
+
+      var phi = d3.scaleLinear()
+        .domain([0, height])
+        .range([90, -90]);
+
+      var radius = d3.scaleLinear()
+        .domain([-1, 5])
+        .range([8, 1]);
+
+      var color = d3.scaleLinear()
+        .domain([-0.2, 0.5, 1.6])
+        .range(["#e6f0ff", "#ffffff", "fff5e6"])
+        .clamp(true);
+
+      function render() {
+        svg.select(".graticule")
+          .attr("d", path);
+
+        var stars = data.map(d => {
+            var p = projection([-d.ra, d.dec]);
+            d[0] = p[0], d[1] = p[1];
+            return d;
+          });
+
+        svg.select(".stars").selectAll("circle")
+          .data(stars)
+          .join("circle")
+            .attr("r", d => radius(d.magnitude))
+            .style("fill", d => color(d.color))
+            .attr("opacity", () => 0.5 * (1 + Math.random()))
+            .attr("cx", d => d[0])
+            .attr("cy", d => d[1]);
+      }
+
+      render();
+
+      var v0, r0, q0;
+      var drag = d3.drag();
+
+      drag.on("start", function(event) {
+        v0 = versor.cartesian(projection.invert(d3.pointer(event, this)));
+        r0 = projection.rotate();
+        q0 = versor(r0);
+      });
+
+      drag.on("drag", function(event) {
+        var v1 = versor.cartesian(projection.rotate(r0).invert(d3.pointer(event, this))),
+            q1 = versor.multiply(q0, versor.delta(v0, v1)),
+            r1 = versor.rotation(q1);
+        projection.rotate(r1);
+        render();
+      });
+
+      svg.call(drag);
+
+      timers = [];
 
       svg.select(".stars").selectAll("circle")
-        .data(stars)
-        .join("circle")
-          .attr("r", d => radius(d.magnitude))
-          .style("fill", d => color(d.color))
-          .attr("opacity", () => 0.5 * (1 + Math.random()))
-          .attr("cx", d => d[0])
-          .attr("cy", d => d[1]);
-    }
-
-    render();
-
-    var v0, r0, q0;
-    var drag = d3.drag();
-
-    drag.on("start", function(event) {
-      v0 = versor.cartesian(projection.invert(d3.pointer(event, this)));
-      r0 = projection.rotate();
-      q0 = versor(r0);
+        .each(function() {
+          var circle = d3.select(this);
+          var dt = 300 * (1 + Math.random());
+          var timer = d3.interval(function() {
+            circle.transition().duration(dt)
+              .attr("opacity", 0.5 * (1 + Math.random()));
+          }, dt);
+          timers.push(timer);
+        });
+    })
+    .catch(function() {
+      svg.select(".message")
+        .text("Failed to load data.");
     });
-
-    drag.on("drag", function(event) {
-      var v1 = versor.cartesian(projection.rotate(r0).invert(d3.pointer(event, this))),
-          q1 = versor.multiply(q0, versor.delta(v0, v1)),
-          r1 = versor.rotation(q1);
-      projection.rotate(r1);
-      render();
-    });
-
-    svg.call(drag);
-
-    timers = [];
-
-    svg.select(".stars").selectAll("circle")
-      .each(function() {
-        var circle = d3.select(this);
-        var dt = 300 * (1 + Math.random());
-        var timer = d3.interval(function() {
-          circle.transition().duration(dt)
-            .attr("opacity", 0.5 * (1 + Math.random()));
-        }, dt);
-        timers.push(timer);
-      });
-  });
 
   function row(d) {
     d.ra = (+d.RAh + d.RAm / 60 + d.RAs / 3600) * (360 / 24);

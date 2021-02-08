@@ -76,9 +76,9 @@ export function create(el, props) {
     .domain(["sample", "point"])
     .range(["#1f77b4", "#d62728"]);
 
-  function redraw(result) {
+  function render(result) {
     svg.select(".info")
-      .text(`log(Z) = ${d3.format(".1f")(result.logz)}`);
+      .text(`log(Z) = ${d3.format(".1f")(result.logZ)}`);
 
     svg.select(".samples").selectAll(".sample")
       .data(result.samples)
@@ -90,7 +90,7 @@ export function create(el, props) {
         .style("fill", color("sample"));
 
     svg.select(".points").selectAll(".point")
-      .data(result.active_points)
+      .data(result.activePoints)
       .join("circle")
         .attr("class", "point")
         .attr("cx", d => scale(d[0]))
@@ -101,12 +101,12 @@ export function create(el, props) {
 
   var tmax = 5 * Math.PI;
 
-  function prior_transform(u) {
+  function priorTransform(u) {
     var v = numeric.clone(u);
     return v;
   }
 
-  function loglikelihood(v) {
+  function logLikelihood(v) {
     var t = numeric.sub(numeric.mul(2 * tmax, v), tmax);
     return Math.pow(2 + Math.cos(t[0] / 2) * Math.cos(t[1] / 2), 5);
   }
@@ -117,8 +117,8 @@ export function create(el, props) {
     d3.select("#control-nest-start").attr("disabled", true);
     svg.selectAll(".point").remove();
     svg.selectAll(".sample").remove();
-    sampling = Nest.sample(loglikelihood, prior_transform, 2, 100)
-      .progress((result) => redraw(result))
+    sampling = Nest.sample(logLikelihood, priorTransform, 2, 100)
+      .progress((result) => render(result))
       .done(() => d3.select("#control-nest-start").attr("disabled", null));
   }
 

@@ -62,82 +62,105 @@ export function create(el, props) {
   svg.append("g")
     .call(d3.axisLeft(y));
 
-  svg.append("line")
-    .attr("class", "average")
-    .attr("x1", 0)
-    .attr("x2", width);
-
   svg.append("text")
+    .attr("class", "message")
     .attr("x", 10)
     .attr("y", 10)
-    .text("Estimated distance to the Galactic Center (kpc)");
+    .text("Loading data ...");
 
-  svg.append("text")
-    .attr("class", "reference")
-    .attr("x", 10)
-    .attr("y", height - 10);
-
-  function average(data) {
-    var weights = data.map(d => 1 / (d.error * d.error));
-    return d3.sum(data.map((d, i) => d.value * weights[i])) / d3.sum(weights);
+  function average(data, callback) {
+    var values = data.filter(callback);
+    var weights = values.map(d => 1 / (d.error * d.error));
+    return d3.sum(values.map((d, i) => d.value * weights[i])) / d3.sum(weights);
   }
 
-  d3.json(dataSrc).then(function(data) {
-    data.forEach(d => d.date = new Date(d.date));
+  d3.json(dataSrc)
+    .then(function(data) {
+      svg.select(".message")
+        .remove();
 
-    var voronoi = Delaunay.from(data, d => x(d.date), d => y(d.value))
-      .voronoi([0, 0, width, height]);
+      svg.append("line")
+        .attr("class", "average")
+        .attr("x1", 0)
+        .attr("x2", width);
 
-    var points = svg.selectAll(".point").data(data)
-      .enter().append("g")
-        .attr("class", "point selected");
+      svg.append("text")
+        .attr("x", 10)
+        .attr("y", 10)
+        .text("Estimated distance to the Galactic Center (kpc)");
 
-    points.append("path")
-      .attr("d", (_, i) => voronoi.renderCell(i));
+      svg.append("text")
+        .attr("class", "reference")
+        .attr("x", 10)
+        .attr("y", height - 10);
 
-    points.append("circle")
-      .attr("cx", d => x(d.date))
-      .attr("cy", d => y(d.value))
-      .attr("r", 4);
+      data.forEach(d => d.date = new Date(d.date));
 
-    points.append("line")
-      .attr("x1", d => x(d.date))
-      .attr("x2", d => x(d.date))
-      .attr("y1", d => y(d.value - d.error))
-      .attr("y2", d => y(d.value + d.error));
+      var voronoi = Delaunay.from(data, d => x(d.date), d => y(d.value))
+        .voronoi([0, 0, width, height]);
 
-    points.on("mouseover", function(event, d) {
-      if (d3.select(this).classed("selected")) {
-        d3.selectAll(".point").classed("hover", false);
-        d3.select(this).classed("hover", true);
-        svg.select(".reference").text(`${d.reference} using ${d.method}`);
-      }
-    });
+      var points = svg.selectAll(".point")
+        .data(data)
+        .join("g")
+          .attr("class", "point selected");
 
-    function change(location) {
-      function isSelected(d) {
-        return (typeof location === "undefined") ||
-          (location === "Any") ||
-          (d.location.indexOf(location) !== -1);
-      }
+      points.append("path")
+        .attr("d", (_, i) => voronoi.renderCell(i));
 
-      points.each(function(d) {
-        d3.select(this).classed("selected", isSelected(d))
+      points.append("circle")
+        .attr("cx", d => x(d.date))
+        .attr("cy", d => y(d.value))
+        .attr("r", 4);
+
+      points.append("line")
+        .attr("x1", d => x(d.date))
+        .attr("x2", d => x(d.date))
+        .attr("y1", d => y(d.value - d.error))
+        .attr("y2", d => y(d.value + d.error));
+
+      points.on("mouseover", function(event, d) {
+        if (d3.select(this).classed("selected")) {
+          d3.selectAll(".point")
+            .classed("hover", false);
+
+          d3.select(this)
+            .classed("hover", true);
+
+          svg.select(".reference")
+            .text(`${d.reference} using ${d.method}`);
+        }
       });
 
-      var R0 = average(data.filter(d => isSelected(d)));
+      function change(location) {
+        var isSelected = d =>
+          (typeof location === "undefined") ||
+          (location === "Any") ||
+          (d.location.indexOf(location) !== -1);
 
-      svg.select(".average")
-        .transition()
-        .attr("y1", y(R0))
-        .attr("y2", y(R0));
-    }
+        d3.selectAll(".point")
+          .classed("hover", false)
+          .classed("selected", d => isSelected(d));
 
-    change(d3.select("#control-distance-location").select("input:checked").property("value"));
+        var R0 = average(data, d => isSelected(d));
 
-    d3.select("#control-distance-location").selectAll("input")
-      .on("change", function() { change(this.value); })
-  });
+        svg.select(".average")
+          .transition()
+          .attr("y1", y(R0))
+          .attr("y2", y(R0));
+      }
+
+      var defaultLocation = d3.select("#control-distance-location")
+        .select("input:checked").property("value");
+
+      change(defaultLocation);
+
+      d3.select("#control-distance-location").selectAll("input")
+        .on("change", function() { change(this.value); })
+    })
+    .catch(function() {
+      svg.select(".message")
+        .text("Failed to load data.");
+    });
 }
 
 export function destroy() {}

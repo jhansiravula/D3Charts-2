@@ -8,14 +8,14 @@ MCMC.delay = 0; // slow down iteration (for visualization)
 
 var SAMPLERS = { ensemble: EnsembleSampler };
 
-MCMC.sample = function(loglikelihood, initialPosition, niter, method) {
+MCMC.sample = function(logLikelihood, initialPosition, nIter, method) {
   if (typeof method === "undefined")
     method = "ensemble";
 
   if (!(method in SAMPLERS))
     console.error("unknown method");
 
-  var sampler = new SAMPLERS[method](loglikelihood, initialPosition);
+  var sampler = new SAMPLERS[method](logLikelihood, initialPosition);
 
   var iteration = $.Deferred();
 
@@ -25,12 +25,12 @@ MCMC.sample = function(loglikelihood, initialPosition, niter, method) {
     iteration.notify({ "iteration": sampler.chain[i], "chain": sampler.getFlatChain() });
 
     i++;
-    if (i > niter) iteration.resolve();
+    if (i > nIter) iteration.resolve();
   }, MCMC.delay);
 
   iteration.done(function() {
     timer.stop();
-    sampler.acceptanceFraction = sampler.nAccepted / niter / sampler.nWalkers;
+    sampler.acceptanceFraction = sampler.nAccepted / nIter / sampler.nWalkers;
   })
   .fail(function() {
     timer.stop();
@@ -39,11 +39,11 @@ MCMC.sample = function(loglikelihood, initialPosition, niter, method) {
   return iteration;
 };
 
-var Walker = function(p0, lnprobfn) {
+var Walker = function(p0, logLikelihood) {
   this.dim = p0.length;
   this.position = p0;
-  this.lnprobfn = lnprobfn;
-  this.lnprob = lnprobfn(p0);
+  this.logLikelihood = logLikelihood;
+  this.logProb = logLikelihood(p0);
 };
 
 Walker.prototype.update = function(z, pos) {
@@ -52,26 +52,26 @@ Walker.prototype.update = function(z, pos) {
   for (var i = 0; i < this.dim; i++)
     proposal[i] = pos[i] - z * (pos[i] - this.position[i]);
 
-  var newLnProb = this.lnprobfn(proposal);
-  var deltaLnProb = (this.dim - 1) * Math.log(z) + newLnProb - this.lnprob;
+  var newLnProb = this.logLikelihood(proposal);
+  var deltaLnProb = (this.dim - 1) * Math.log(z) + newLnProb - this.logProb;
 
   if (deltaLnProb > Math.log(Math.random())) {
     this.position = proposal;
-    this.lnprob = newLnProb;
+    this.logProb = newLnProb;
     return 1;
   }
 
   return 0;
 };
 
-function EnsembleSampler(lnprobfn, initialPosition) {
-  this.lnprobfn = lnprobfn;
+function EnsembleSampler(logLikelihood, initialPosition) {
+  this.logLikelihood = logLikelihood;
   this.a = 2;
 
   this.walkers = new Array();
   this.nWalkers = initialPosition.length;
   for (var k = 0; k < this.nWalkers; k++)
-    this.walkers[k] = new Walker(initialPosition[k], this.lnprobfn);
+    this.walkers[k] = new Walker(initialPosition[k], this.logLikelihood);
 
   this.chain = new Array();
   this.nAccepted = 0;

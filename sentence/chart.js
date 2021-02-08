@@ -50,81 +50,97 @@ export function create(el, props) {
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  svg.append("path")
-    .attr("fill", "none")
-    .attr("stroke", "black")
-    .attr("stroke-width", 1)
-    .attr("stroke-opacity", 0.2);
+  svg.append("text")
+    .attr("class", "message")
+    .attr("alignment-baseline", "hanging")
+    .text("Loading data ...");
 
-  var turn = 0.5 * Math.PI;
+  d3.json(dataSrc)
+    .then(function(counts) {
+      svg.select(".message")
+        .remove();
 
-  var xScale = d3.scaleLinear().range([0, width]),
-      yScale = d3.scaleLinear().range([height, 0]),
-      aspect = width / height;
+      svg.append("path")
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("stroke-opacity", 0.2);
 
-  var line = d3.line()
-    .x(d => xScale(d.x))
-    .y(d => yScale(d.y))
-    .curve(d3.curveLinear);
+      var turn = 0.5 * Math.PI;
 
-  function render(counts) {
-    svg.select("path").interrupt();
+      var xScale = d3.scaleLinear().range([0, width]),
+          yScale = d3.scaleLinear().range([height, 0]),
+          aspect = width / height;
 
-    if (typeof counts === "undefined")
-      return;
+      var line = d3.line()
+        .x(d => xScale(d.x))
+        .y(d => yScale(d.y))
+        .curve(d3.curveLinear);
 
-    var x0 = 0, x1 = 0,
-        y0 = 0, y1 = 0;
+      function render(counts) {
+        svg.select("path").interrupt();
 
-    var angle = 0,
-        pos = new numeric.T(0, 0),
-        data = [{ x: pos.x, y: pos.y }];
+        if (typeof counts === "undefined")
+          return;
 
-    counts.sentences.forEach((d, i) => {
-      angle += turn;
+        var x0 = 0, x1 = 0,
+            y0 = 0, y1 = 0;
 
-      var step = new numeric.T(0, 1);
-      step = step.mul(angle).exp().mul(d);
+        var angle = 0,
+            pos = new numeric.T(0, 0),
+            data = [{ x: pos.x, y: pos.y }];
 
-      pos = pos.add(step);
+        counts.sentences.forEach((d, i) => {
+          angle += turn;
 
-      if (pos.x < x0)
-        x0 = pos.x;
+          var step = new numeric.T(0, 1);
+          step = step.mul(angle).exp().mul(d);
 
-      if (pos.x > x1)
-        x1 = pos.x;
+          pos = pos.add(step);
 
-      if (pos.y < y0)
-        y0 = pos.y;
+          if (pos.x < x0)
+            x0 = pos.x;
 
-      if (pos.y > y1)
-        y1 = pos.y;
+          if (pos.x > x1)
+            x1 = pos.x;
 
-      data.push({ x: pos.x, y: pos.y });
+          if (pos.y < y0)
+            y0 = pos.y;
+
+          if (pos.y > y1)
+            y1 = pos.y;
+
+          data.push({ x: pos.x, y: pos.y });
+        });
+
+        if (y1 - y0 > (x1 - x0) / aspect) {
+          xScale.domain([(x1 + x0) / 2 - (y1 - y0) / 2 * aspect, (x1 + x0) / 2 + (y1 - y0) / 2 * aspect]);
+          yScale.domain([y0, y1]);
+        } else {
+          xScale.domain([x0, x1]);
+          yScale.domain([(y1 + y0) / 2 - (x1 - x0) / 2 / aspect, (y1 + y0) / 2 + (x1 - x0) / 2 / aspect]);
+        }
+
+        svg.select("path")
+          .transition().duration(5000).ease(d3.easeCubic)
+          .attrTween("d", function() {
+            var interpolate = d3.scaleQuantile().domain([0, 1]).range(d3.range(1, data.length + 1));
+            return t => line(data.slice(0, interpolate(t)));
+          });
+      }
+
+      var defaultText = d3.select("#control-sentence-text")
+        .select("input:checked").property("value");
+
+      render(counts.find(d => d.fileName == defaultText));
+
+      d3.select("#control-sentence-text").selectAll("input")
+        .on("change", function() { render(counts.find(d => d.fileName == this.value)); })
+    })
+    .catch(function() {
+      svg.select(".message")
+        .text("Failed to load data.");
     });
-
-    if (y1 - y0 > (x1 - x0) / aspect) {
-      xScale.domain([(x1 + x0) / 2 - (y1 - y0) / 2 * aspect, (x1 + x0) / 2 + (y1 - y0) / 2 * aspect]);
-      yScale.domain([y0, y1]);
-    } else {
-      xScale.domain([x0, x1]);
-      yScale.domain([(y1 + y0) / 2 - (x1 - x0) / 2 / aspect, (y1 + y0) / 2 + (x1 - x0) / 2 / aspect]);
-    }
-
-    svg.select("path")
-      .transition().duration(5000).ease(d3.easeCubic)
-      .attrTween("d", function() {
-        var interpolate = d3.scaleQuantile().domain([0, 1]).range(d3.range(1, data.length + 1));
-        return t => line(data.slice(0, interpolate(t)));
-      });
-  }
-
-  d3.json(dataSrc).then(function(counts) {
-    render(counts.find(d => d.fileName == d3.select("#control-sentence-text").select("input:checked").property("value")));
-
-    d3.select("#control-sentence-text").selectAll("input")
-      .on("change", function() { render(counts.find(d => d.fileName == this.value)); })
-  });
 }
 
 export function destroy() {}

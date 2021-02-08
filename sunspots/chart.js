@@ -42,17 +42,15 @@ export function create(el, props) {
     .domain([-40, 40])
     .rangeRound([height, 0]);
 
-  var color = d3.scaleSequential(d3.interpolateYlOrBr);
-
   svg.append("g")
     .attr("class", "grid")
   .selectAll("path")
     .data(d3.range(-30, 40, 10))
-  .enter().append("path")
-    .attr("d", d => `M0,${y(d)}H${width}`)
-    .style("stroke", "lightgrey")
-    .style("stroke-opacity", 0.7)
-    .style("shape-rendering", "crispEdges");
+    .join("path")
+      .attr("d", d => `M0,${y(d)}H${width}`)
+      .style("stroke", "lightgrey")
+      .style("stroke-opacity", 0.7)
+      .style("shape-rendering", "crispEdges");
 
   svg.append("g")
     .attr("class", "contours");
@@ -91,13 +89,14 @@ export function create(el, props) {
         .bandwidth(6)
         (spots);
 
-      color.domain(d3.extent(density, d => d.value));
+      var color = d3.scaleSequential(d3.interpolateYlOrBr)
+        .domain(d3.extent(density, d => d.value));
 
       svg.select(".contours").selectAll("path")
         .data(density)
-      .enter().append("path")
-        .attr("fill", d => color(d.value))
-        .attr("d", d3.geoPath());
+        .join("path")
+          .attr("fill", d => color(d.value))
+          .attr("d", d3.geoPath());
     })
     .catch(function() {
       svg.select(".message")

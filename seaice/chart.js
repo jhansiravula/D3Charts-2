@@ -65,7 +65,7 @@ export function create(el, props) {
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
   svg.append("rect")
-    .attr("fill", "#fff")
+    .attr("fill", "#ffffff")
     .attr("width", width)
     .attr("height", height);
 
@@ -74,13 +74,6 @@ export function create(el, props) {
     .attr("alignment-baseline", "hanging")
     .attr("dx", 10)
     .text("Loading data ...");
-
-  svg.append("text")
-    .attr("class", "inset")
-    .attr("y", height)
-    .attr("dx", 10)
-    .attr("dy", -10)
-    .style("font-size", 40);
 
   svg.append("g")
     .attr("class", "axis axis-x")
@@ -98,13 +91,17 @@ export function create(el, props) {
     .attr("class", "axis axis-y");
 
   Promise
-    .all([
-      d3.csv(data_north_csv, (d, i) => row(d, i, "north")),
-      d3.csv(data_south_csv, (d, i) => row(d, i, "south"))
-    ])
+    .all([d3.csv(data_north_csv, (d, i) => row(d, i, "north")), d3.csv(data_south_csv, (d, i) => row(d, i, "south"))])
     .then(function([data_north, data_south]) {
       svg.select(".message")
         .remove();
+
+      svg.append("text")
+        .attr("class", "inset")
+        .attr("y", height)
+        .attr("dx", 10)
+        .attr("dy", -10)
+        .style("font-size", 40);
 
       svg.append("text")
         .attr("alignment-baseline", "hanging")
@@ -114,7 +111,7 @@ export function create(el, props) {
       var regions = {
         north: { data: [data_north], domain: [0, 22] },
         south: { data: [data_south], domain: [0, 22] },
-        global: { data: [data_north, data_south], domain: [0, 30] },
+        global: { data: [data_north, data_south], domain: [0, 30] }
       };
 
       d3.keys(regions).forEach(key => regions[key].map = nest.map(d3.merge(regions[key].data)));
@@ -136,14 +133,16 @@ export function create(el, props) {
             .attr("d", d => line(d.data));
       }
 
-      change(d3.select("#control-seaice-region").select("input:checked").property("value"));
+      var defaultRegion = d3.select("#control-seaice-region")
+        .select("input:checked").property("value");
+
+      change(defaultRegion);
 
       d3.select("#control-seaice-region").selectAll("input")
         .on("change", function() { change(this.value); });
 
-      svg
-        .on("mousemove", hover)
-        .on("touchmove", hover);
+      svg.on("mousemove", hover);
+      svg.on("touchmove", hover);
 
       function hover(event) {
         var p = d3.pointer(event);

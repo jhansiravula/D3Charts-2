@@ -144,8 +144,8 @@ export function create(el, props) {
 
   svg.selectAll(".ray")
     .data([[origin], [pivot], [pivot]])
-  .enter().append("path")
-    .attr("class", (d, i) => `ray ray${i}`);
+    .join("path")
+      .attr("class", (d, i) => `ray ray${i}`);
 
   svg.append("path")
     .attr("class", "surface");

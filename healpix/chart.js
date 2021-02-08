@@ -35,15 +35,6 @@ export function create(el, props) {
     .attr("viewBox", `0 0 ${width} ${height}`)
     .attr("preserveAspectRatio", "xMidYMid meet");
 
-  svg.append("path")
-    .datum(d3.geoGraticule().outline)
-    .attr("class", "graticule")
-    .style("stroke", "black")
-    .style("stroke-width", 3);
-
-  var deg2rad = x => x * Math.PI / 180,
-      rad2deg = x => x * 180 / Math.PI;
-
   var options = [
     { name: "Aitoff", projection: d3.geoAitoff() },
     { name: "Baker", projection: d3.geoBaker() },
@@ -72,72 +63,92 @@ export function create(el, props) {
     return option.projection;
   }
 
-  d3.csv(dataSrc, row).then(function(stars) {
-    var nside = 6;
+  svg.append("text")
+    .attr("class", "message")
+    .attr("alignment-baseline", "hanging")
+    .text("Loading data ...");
 
-    var counts = {};
-    stars.forEach(star => {
-      var XY = HealPix.ang2XY(star, nside);
-      counts[XY] = (counts[XY] || 0) + 1;
+  d3.csv(dataSrc, row)
+    .then(function(stars) {
+      svg.select(".message")
+        .remove();
+
+      var nside = 6;
+
+      var counts = {};
+      stars.forEach(star => {
+        var XY = HealPix.ang2XY(star, nside);
+        counts[XY] = (counts[XY] || 0) + 1;
+      });
+
+      var features = d3.entries(counts).map(d => {
+        var XY = +d.key;
+        var boundary = HealPix.boundary(XY, nside, 3);
+        return {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: boundary.map(ang => {
+              var lon = rad2deg(ang.lon),
+                  lat = rad2deg(ang.lat);
+              return [180 - lon, lat];
+            })
+          },
+          properties: {
+            "XY": XY,
+            "value": d.value
+          }
+        };
+      });
+
+      var extent = d3.extent(features, d => d.properties.value),
+          color = d3.scaleLinear().domain(extent).range(["#fff", "#1f77b4"]);
+
+      var projection = getProjection();
+
+      svg.append("path")
+        .datum(d3.geoGraticule().outline)
+        .attr("class", "graticule")
+        .style("fill", color(extent[0]))
+        .style("stroke", "black")
+        .style("stroke-width", 3)
+        .attr("d", d3.geoPath(projection));
+
+      svg.selectAll(".healpix")
+        .data(features, d => d.properties.XY)
+        .join("path")
+          .attr("d", d3.geoPath(projection))
+          .style("stroke", "gray")
+          .style("fill", d => color(d.properties.value));
+
+      var dt = 2000;
+      timer = d3.interval(function() {
+        svg.transition()
+          .duration(dt)
+          .each(function() {
+            d3.select(this).selectAll("path")
+              .attr("stroke-opacity", 1)
+              .transition()
+              .delay(2 / 6 * dt)
+              .duration(1 / 6 * dt)
+              .attr("stroke-opacity", 0)
+              .transition()
+              .duration(2 / 6 * dt)
+              .attrTween("d", projectionTween(projection, projection = getProjection()))
+              .transition()
+              .duration(1 / 6 * dt)
+              .attr("stroke-opacity", 1)
+              .transition();
+          });
+      }, dt);
+    })
+    .catch(function() {
+      svg.select(".message")
+        .text("Failed to load data.");
     });
 
-    var features = d3.entries(counts).map(d => {
-      var XY = +d.key;
-      var boundary = HealPix.boundary(XY, nside, 3);
-      return {
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: boundary.map(ang => {
-            var lon = rad2deg(ang.lon),
-                lat = rad2deg(ang.lat);
-            return [180 - lon, lat];
-          })
-        },
-        properties: {
-          "XY": XY,
-          "value": d.value
-        }
-      };
-    });
-
-    var extent = d3.extent(features, d => d.properties.value),
-        color = d3.scaleLinear().domain(extent).range(["#fff", "#1f77b4"]);
-
-    var projection = getProjection();
-
-    svg.selectAll(".graticule")
-      .style("fill", color(extent[0]))
-      .attr("d", d3.geoPath(projection));
-
-    svg.selectAll(".healpix")
-      .data(features, d => d.properties.XY)
-    .enter().append("path")
-      .attr("d", d3.geoPath(projection))
-      .style("stroke", "gray")
-      .style("fill", d => color(d.properties.value));
-
-    var dt = 2000;
-    timer = d3.interval(function() {
-      svg.transition()
-        .duration(dt)
-        .each(function() {
-          d3.select(this).selectAll("path")
-            .attr("stroke-opacity", 1)
-            .transition()
-            .delay(2 / 6 * dt)
-            .duration(1 / 6 * dt)
-            .attr("stroke-opacity", 0)
-            .transition()
-            .duration(2 / 6 * dt)
-            .attrTween("d", projectionTween(projection, projection = getProjection()))
-            .transition()
-            .duration(1 / 6 * dt)
-            .attr("stroke-opacity", 1)
-            .transition();
-        });
-    }, dt);
-  });
+  var deg2rad = x => x * Math.PI / 180,
+      rad2deg = x => x * 180 / Math.PI;
 
   function row(d) {
     d.lon = deg2rad(+d.glon);

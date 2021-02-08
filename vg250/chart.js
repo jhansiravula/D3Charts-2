@@ -14,7 +14,7 @@ export const id = "vg250";
 export const name = "Population Density";
 export const readme = "The population density of counties in Germany (2018).";
 export const sources = [
-  { url: "https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-ebenen-stand-01-01-vg250-ebenen-01-01.html", description: "Verwaltungsgebiete 1:250000, ©GeoBasis-DE/BK (2020), dl-de/by-2-0" },
+  { url: "https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-ebenen-stand-01-01-vg250-ebenen-01-01.html", description: ["Verwaltungsgebiete 1:250000,", "©GeoBasis-DE/BK (2020),", "dl-de/by-2-0"] },
   { url: "https://ec.europa.eu/eurostat/de/web/products-datasets/product?code=demo_r_d3dens", description: "eurostat" }
 ];
 
@@ -71,8 +71,16 @@ export function create(el, props) {
       .style("fill", "currentColor")
       .style("font-style", "italic");
 
+  svg.append("text")
+    .attr("class", "message")
+    .attr("alignment-baseline", "hanging")
+    .attr("dy", 50)
+    .text("Loading data ...");
+
   d3.json(dataSrc)
     .then(function(topo) {
+      svg.select(".message")
+        .remove();
 
       // draw info box
 
@@ -116,6 +124,10 @@ export function create(el, props) {
           };
         });
       }
+    })
+    .catch(function() {
+      svg.select(".message")
+        .text("Failed to load data.");
     });
 }
 

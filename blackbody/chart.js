@@ -86,82 +86,88 @@ export function create(el, props) {
       .text("Spectral Radiance (simplified units)");
 
   var line = d3.line()
-    .x(d => xscale(d[0]))
-    .y(d => yscale(d[1]))
+    .x(d => x(d[0]))
+    .y(d => y(d[1]))
     .defined(d => !isNaN(d[1]))
     .curve(d3.curveBasis);
 
   var area = d3.area()
-    .x(d => xscale(d[0]))
+    .x(d => x(d[0]))
     .y0(height)
-    .y1(d => yscale(d[1]))
+    .y1(d => y(d[1]))
     .defined(d => !isNaN(d[1]))
     .curve(d3.curveBasis);
 
-  function defaultTransition(transition) { return transition.duration(1000).ease(d3.easeSin); }
+  var defaultTransition = t => t.duration(1000).ease(d3.easeSin);
 
-  var canvas = svg.append("g").attr("clip-path", "url(#def-blackbody-clipPath)");
-  canvas.append("path").attr("class", "filling"),
-  canvas.append("path").attr("class", "peak curve");
-  var curves = canvas.append("g");
+  var canvas = svg.append("g")
+    .attr("clip-path", "url(#def-blackbody-clipPath)");
+
+  canvas.append("path")
+    .attr("class", "filling");
+
+  canvas.append("path")
+    .attr("class", "curve peak");
+
+  canvas.append("g")
+    .attr("class", "curves");
 
   // initial parameters
 
   var h = 1, c = 1, k = 1;
   var T = 1;
 
-  function BB(nu, T) { return 2 * h / (c*c) * Math.pow(nu, 3) / (Math.exp(h * nu / (k * T)) - 1); }
-  function B0(nu) { return 0.126574 * h / (c*c) * Math.pow(nu, 3); }
-
+  var BB = (nu, T) => 2 * h / (c*c) * Math.pow(nu, 3) / (Math.exp(h * nu / (k * T)) - 1);
+  var B0 = nu => 0.126574 * h / (c*c) * Math.pow(nu, 3);
   var Bnu = [
-    { id: "jeans", f: function(nu, T) { return 2 * k * T / (c*c) * Math.pow(nu, 2); } },
-    { id: "wien", f: function(nu, T) { return 2 * h / (c*c) * Math.pow(nu, 3) * Math.exp(- h * nu / (k * T)); } },
+    { id: "jeans", f: (nu, T) => 2 * k * T / (c*c) * Math.pow(nu, 2) },
+    { id: "wien", f: (nu, T) => 2 * h / (c*c) * Math.pow(nu, 3) * Math.exp(- h * nu / (k * T)) },
     { id: "planck", f: BB }];
 
   // update axes
 
-  var range, xscale, yscale;
+  var range, x, y;
 
-  function setScale(value) {
+  function renderAxes(value) {
     if (value == "lin")
     {
       range = d3.range(0, 10.1, 0.1);
 
-      xscale = d3.scaleLinear()
+      x = d3.scaleLinear()
         .domain(d3.extent(range))
         .range([0, width]);
 
-      yscale = d3.scaleLinear()
+      y = d3.scaleLinear()
         .domain([0, 3])
         .range([height, 0]);
     }
     else if (value == "log") {
       range = d3.range(0.1, 10.1, 0.1);
 
-      xscale = d3.scaleLog()
+      x = d3.scaleLog()
         .domain(d3.extent(range))
         .range([0, width]);
 
-      yscale = d3.scaleLog()
+      y = d3.scaleLog()
         .domain([0.1, 3])
         .range([height, 0]);
     }
 
     svg.select(".axis.x")
       .transition().call(defaultTransition)
-        .call(d3.axisBottom().scale(xscale));
+        .call(d3.axisBottom().scale(x));
 
     svg.select(".axis.y")
       .transition().call(defaultTransition)
-        .call(d3.axisLeft().scale(yscale));
+        .call(d3.axisLeft().scale(y));
   }
 
   // update chart
 
-  function render() {
-    Bnu.forEach(d => { d.data = range.map(function(nu) { return [nu, d.f(nu, T)]; }); });
+  function renderChart() {
+    Bnu.forEach(d => { d.data = range.map(nu => [nu, d.f(nu, T)]); });
 
-    var curve = curves.selectAll(".curve")
+    canvas.select(".curves").selectAll(".curve")
       .data(Bnu, d => d.id)
       .join("path")
         .attr("class", d => `curve ${d.id}`)
@@ -179,21 +185,24 @@ export function create(el, props) {
 
   // initial rendering
 
-  setScale(d3.select("#control-blackbody-scale").select("input:checked").property("value"));
-  render();
+  var defaultScale = d3.select("#control-blackbody-scale")
+    .select("input:checked").property("value");
+
+  renderAxes(defaultScale);
+  renderChart();
 
   // controls
 
   d3.select("#control-blackbody-T")
     .on("change", function() {
       T = +this.value;
-      render();
+      renderChart();
     });
 
   d3.selectAll("#control-blackbody-scale").selectAll("input")
     .on("change", function() {
-      setScale(this.value);
-      render();
+      renderAxes(this.value);
+      renderChart();
     });
 }
 

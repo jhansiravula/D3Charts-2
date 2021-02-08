@@ -73,9 +73,9 @@ export function create(el, props) {
 
   svg.selectAll(".lines")
     .data([{ key: "A" }, { key: "B" }])
-  .enter().append("g")
-    .attr("class", d => `lines ${d.key}`)
-    .style("stroke", d => color[d.key]);
+    .join("g")
+      .attr("class", d => `lines ${d.key}`)
+      .style("stroke", d => color[d.key]);
 
   svg.append("g")
     .attr("class", "points")
@@ -83,16 +83,13 @@ export function create(el, props) {
     .attr("class", "truth");
 
   svg.append("text").selectAll("tspan")
-    .data([
-      { key: "B", label: "Narrow plus broad component" },
-      { key: "A", label: "Single component" }
-    ])
-  .enter().append("tspan")
-    .attr("class", d => `legend ${d.key}`)
-    .text(d => d.label)
-    .style("fill", d => color[d.key])
-    .attr("x", 0)
-    .attr("y", (d, i) => `${3 + 1.5*i}em`);
+    .data([{ key: "B", label: "Narrow plus broad component" }, { key: "A", label: "Single component" }])
+    .join("tspan")
+      .attr("class", d => `legend ${d.key}`)
+      .text(d => d.label)
+      .style("fill", d => color[d.key])
+      .attr("x", 0)
+      .attr("y", (d, i) => `${3 + 1.5*i}em`);
 
   svg.append("text")
     .attr("class", "info")
@@ -103,17 +100,17 @@ export function create(el, props) {
     return Math.exp(-x * x / (2 * dx * dx));
   }
 
-  var xscale = d3.scaleLinear()
+  var x = d3.scaleLinear()
     .domain([-5, 5])
     .range([0, width]);
 
-  var yscale = d3.scaleLinear()
+  var y = d3.scaleLinear()
     .domain([-0.1, 1.6])
     .range([height, 0]);
 
   var line = d3.line()
-    .x(d => xscale(d[0]))
-    .y(d => yscale(d[1]));
+    .x(d => x(d[0]))
+    .y(d => y(d[1]));
 
   function linspace(domain, n) {
     var dx = (domain[1] - domain[0]) / (n - 1);
@@ -125,14 +122,14 @@ export function create(el, props) {
   }
 
   function interpolate(f) {
-    return linspace(xscale.domain(), 200).map(x => [x, f(x)]);
+    return linspace(x.domain(), 200).map(x => [x, f(x)]);
   }
 
   var state = {
-    npoints: 30, // number of active points
+    nPoints: 30, // number of active points
     _strength: +d3.select("#control-lines-strength").property("value"), // strength of broad component
     _width: +d3.select("#control-lines-width").property("value"), // width of broad component
-    ndata: 25, // number of data points
+    nData: 25, // number of data points
     sigma: 0.075, // measurement error
     get strength() {
       return this._strength;
@@ -149,7 +146,7 @@ export function create(el, props) {
       this.update();
     },
     randomize: function() {
-      this.x = randspace(xscale.domain(), this.ndata);
+      this.x = randspace(x.domain(), this.nData);
       this.yerr = this.x.map(() => d3.randomNormal(0, this.sigma)());
       this.update();
     },
@@ -179,10 +176,10 @@ export function create(el, props) {
       .style("fill", "black");
 
     g.merge(points)
-      .attr("transform", d => `translate(${xscale(d[0])},${yscale(d[1])})`)
+      .attr("transform", d => `translate(${x(d[0])},${y(d[1])})`)
     .select("line")
-      .attr("y1", d => yscale(d[0] + state.sigma) - yscale(d[0]))
-      .attr("y2", d => yscale(d[0] - state.sigma) - yscale(d[0]));
+      .attr("y1", d => y(d[0] + state.sigma) - y(d[0]))
+      .attr("y2", d => y(d[0] - state.sigma) - y(d[0]));
 
     points.exit()
       .remove();
@@ -198,11 +195,10 @@ export function create(el, props) {
   function updateLines(selection, data) {
     var lines = data.map(v => {
       return interpolate(x => {
-        if (v.length === 4) {
+        if (v.length === 4)
           return v[0] + v[1] * f(x - v[2], v[3]);
-        } else if (v.length === 6) {
+        else if (v.length === 6)
           return v[0] + v[1] * f(x - v[2], v[3]) + v[4] * f(x - v[2], v[5]);
-        }
       })
     });
 
@@ -215,41 +211,38 @@ export function create(el, props) {
         .attr("d", line);
   }
 
-  function prior_uniform(x, a, b) {
+  function priorUniform(x, a, b) {
     return a + (b - a) * x;
   }
 
-  function prior_transform(u) {
+  function priorTransform(u) {
     var v = numeric.clone(u);
 
     if (u.length === 4) {
-      v[0] = prior_uniform(v[0], -0.5, 0.5) // continuum
-      v[1] = prior_uniform(v[1], 0, 1); // strength
-      v[2] = prior_uniform(v[2], -1, 1); // mean
-      v[3] = prior_uniform(v[3], 0.5, 3); // sigma
+      v[0] = priorUniform(v[0], -0.5, 0.5) // continuum
+      v[1] = priorUniform(v[1], 0, 1); // strength
+      v[2] = priorUniform(v[2], -1, 1); // mean
+      v[3] = priorUniform(v[3], 0.5, 3); // sigma
     } else if (u.length === 6) {
-      v[0] = prior_uniform(v[0], -0.5, 0.5) // continuum
-      v[1] = prior_uniform(v[1], 0, 1); // strength
-      v[2] = prior_uniform(v[2], -1, 1); // mean
-      v[3] = prior_uniform(v[3], 0.5, 3); // sigma
-      v[4] = prior_uniform(v[4], 0, 1); // strength (broad component)
-      v[5] = prior_uniform(v[5], 1, 5); // sigma (broad component)
+      v[0] = priorUniform(v[0], -0.5, 0.5) // continuum
+      v[1] = priorUniform(v[1], 0, 1); // strength
+      v[2] = priorUniform(v[2], -1, 1); // mean
+      v[3] = priorUniform(v[3], 0.5, 3); // sigma
+      v[4] = priorUniform(v[4], 0, 1); // strength (broad component)
+      v[5] = priorUniform(v[5], 1, 5); // sigma (broad component)
     }
 
     return v;
   }
 
-  function loglikelihood(v) {
-    if (v.length === 4) {
+  function logLikelihood(v) {
+    if (v.length === 4)
       var dy = state.data.map(d => (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]))) / state.sigma);
-    } else if (v.length === 6) {
+    else if (v.length === 6)
       var dy = state.data.map(d => (d[1] - (v[0] + v[1] * f(d[0] - v[2], v[3]) + v[4] * f(d[0] - v[2], v[5]))) / state.sigma);
-    }
 
     return -numeric.sum(numeric.pow(dy, 2)) / 2;
   }
-
-  sampling = [$.Deferred(), $.Deferred()];
 
   function disableControls() {
     d3.select("#control-lines-sample").attr("disabled", true);
@@ -272,12 +265,14 @@ export function create(el, props) {
   }
 
   function updateInfo(resultA, resultB) {
-    var K = 10 * (resultB.logz - resultA.logz) / Math.log(10);
-    var Kerr = 10 * Math.sqrt(resultB.logzerr ** 2 + resultA.logzerr ** 2) / Math.log(10);
+    var K = 10 * (resultB.logZ - resultA.logZ) / Math.log(10);
+    var Kerr = 10 * Math.sqrt(resultB.logZerr ** 2 + resultA.logZerr ** 2) / Math.log(10);
     svg.select(".info").text(`K = ${d3.format(".1f")(K)} ± ${d3.format(".1f")(Kerr)} ban`);
     d3.select(".legend.B").style("opacity", 1).style("font-weight", () => K >= 10 ? "bold" : "normal");
     d3.select(".legend.A").style("opacity", 1).style("font-weight", () => K < 10 ? "bold" : "normal");
   }
+
+  sampling = [$.Deferred(), $.Deferred()];
 
   function start() {
     clearChart();
@@ -285,24 +280,24 @@ export function create(el, props) {
 
     var progress = {};
 
-    sampling[0] = Nest.sample(loglikelihood, prior_transform, 4, state.npoints)
+    sampling[0] = Nest.sample(logLikelihood, priorTransform, 4, state.nPoints)
       .progress(function(result) {
         progress.resultA = result;
-        svg.select(".lines.A").call(updateLines, result.active_points);
+        svg.select(".lines.A").call(updateLines, result.activePoints);
         if (progress.resultA && progress.resultB) updateInfo(progress.resultA, progress.resultB);
       });
 
-    sampling[1] = Nest.sample(loglikelihood, prior_transform, 6, state.npoints)
+    sampling[1] = Nest.sample(logLikelihood, priorTransform, 6, state.nPoints)
       .progress(function(result) {
         progress.resultB = result;
-        svg.select(".lines.B").call(updateLines, result.active_points);
+        svg.select(".lines.B").call(updateLines, result.activePoints);
         if (progress.resultA && progress.resultB) updateInfo(progress.resultA, progress.resultB);
       });
 
     $.when.apply($, sampling).done(function(resultA, resultB) {
       enableControls();
-      svg.select(".lines.A").call(updateLines, Nest.resample_equal(resultA.samples, resultA.weights));
-      svg.select(".lines.B").call(updateLines, Nest.resample_equal(resultB.samples, resultB.weights));
+      svg.select(".lines.A").call(updateLines, Nest.resampleEqual(resultA.samples, resultA.weights));
+      svg.select(".lines.B").call(updateLines, Nest.resampleEqual(resultB.samples, resultB.weights));
       updateInfo(resultA, resultB);
     });
   }

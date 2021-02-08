@@ -68,56 +68,72 @@ export function create(el, props) {
     .attr("stroke-opacity", 0.2)
     .attr("d", path);
 
-  d3.csv(dataSrc, row).then(function(craters) {
-    svg.selectAll(".crater")
-      .data(craters.map(d => circle(d)))
-    .enter().append("path")
-      .attr("class", "crater geo-path")
-      .attr("fill", "#969696")
-      .attr("stroke", "#737373")
-      .attr("fill-opacity", 0.5)
-      .attr("d", path);
+  svg.append("text")
+    .attr("class", "message")
+    .attr("alignment-baseline", "hanging")
+    .attr("dx", 10)
+    .attr("dy", 10)
+    .attr("fill", "#ffffff")
+    .text("Loading data ...");
 
-    function render() {
-      d3.selectAll(".geo-path")
-        .attr("d", path);
-    }
+  d3.csv(dataSrc, row)
+    .then(function(craters) {
+      svg.select(".message")
+        .remove();
 
-    function start() {
-      return d3.interval(function() {
-        var origin = projection.rotate();
-        origin[0] += 0.1;
-        projection.rotate(origin);
-        render();
-      }, 20);
-    }
+      svg.selectAll(".crater")
+        .data(craters.map(d => circle(d)))
+        .join("path")
+          .attr("class", "crater geo-path")
+          .attr("fill", "#969696")
+          .attr("stroke", "#737373")
+          .attr("fill-opacity", 0.5)
+          .attr("d", path);
 
-    timer = start();
+      function render() {
+        d3.selectAll(".geo-path")
+          .attr("d", path);
+      }
 
-    var v0, r0, q0;
-    var drag = d3.drag();
+      function start() {
+        return d3.interval(function() {
+          var origin = projection.rotate();
+          origin[0] += 0.1;
+          projection.rotate(origin);
+          render();
+        }, 20);
+      }
 
-    drag.on("start", function(event) {
-      timer.stop();
-      v0 = versor.cartesian(projection.invert(d3.pointer(event, this)));
-      r0 = projection.rotate();
-      q0 = versor(r0);
-    });
-
-    drag.on("drag", function(event) {
-      var v1 = versor.cartesian(projection.rotate(r0).invert(d3.pointer(event, this))),
-          q1 = versor.multiply(q0, versor.delta(v0, v1)),
-          r1 = versor.rotation(q1);
-      projection.rotate(r1);
-      render();
-    });
-
-    drag.on("end", function() {
       timer = start();
-    })
 
-    svg.call(drag);
-  });
+      var v0, r0, q0;
+      var drag = d3.drag();
+
+      drag.on("start", function(event) {
+        timer.stop();
+        v0 = versor.cartesian(projection.invert(d3.pointer(event, this)));
+        r0 = projection.rotate();
+        q0 = versor(r0);
+      });
+
+      drag.on("drag", function(event) {
+        var v1 = versor.cartesian(projection.rotate(r0).invert(d3.pointer(event, this))),
+            q1 = versor.multiply(q0, versor.delta(v0, v1)),
+            r1 = versor.rotation(q1);
+        projection.rotate(r1);
+        render();
+      });
+
+      drag.on("end", function() {
+        timer = start();
+      })
+
+      svg.call(drag);
+    })
+    .catch(function() {
+      svg.select(".message")
+        .text("Failed to load data.");
+    });
 
   function row(d) {
     d.Lon = +d.Lon;

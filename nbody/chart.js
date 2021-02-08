@@ -139,7 +139,7 @@ export function create(el, props) {
     particles.push(p);
   }
 
-  // draw particles
+  // redraw particles
 
   var x = d3.scaleLinear()
     .domain([-box / 2, box / 2])
@@ -153,14 +153,6 @@ export function create(el, props) {
     .domain([0, 1])
     .range(["#969696", "black"]);
 
-  // run simulation
-
-  function tick() {
-    integrator_part1();
-    calculate_gravity();
-    integrator_part2();
-  }
-
   function render() {
     svg.selectAll("circle")
       .data(particles)
@@ -170,6 +162,16 @@ export function create(el, props) {
         .attr("cy", d => y(d.y))
         .attr("r", 3);
   }
+
+  // advance simulation
+
+  function tick() {
+    integrator_part1();
+    calculate_gravity();
+    integrator_part2();
+  }
+
+  // start animation
 
   simulationTimer = d3.interval(tick, dt);
   renderTimer = d3.interval(render, 50);

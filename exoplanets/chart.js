@@ -51,57 +51,40 @@ export function create(el, props) {
 
   svg.append("text")
     .attr("class", "message")
+    .attr("alignment-baseline", "hanging")
     .text("Loading data from the NASA Exoplanet Archive ...");
-
-  svg.append("text")
-    .attr("class", "info name")
-    .style("font-weight", "bold")
-    .style("font-size", "120%");
-
-  svg.append("text").selectAll("tspan")
-    .data(["radius", "mass", "separation"])
-  .enter().append("tspan")
-    .attr("class", d => `info ${d}`)
-    .attr("x", 0)
-    .attr("y", (d, i) => `${2 + 1.5*i}em`);
-
-  var pack = d3.pack()
-    .size([size, size])
-    .padding(5);
-
-  var color = d3.scaleLinear()
-    .domain([0, 1.6])
-    .range(["#fff", "#1f77b4"])
-    .clamp(true);
-
-  function sortBy(prop) {
-    if (typeof prop !== "undefined" && prop != "undefined") {
-      return (a, b) => a.data[prop] - b.data[prop];
-    } else {
-      return (a, b) => Math.round(Math.random()) * 2 - 1;
-    }
-  }
 
   d3.csv(url, row)
     .then(function(data) {
       svg.select(".message")
         .remove();
 
+      svg.append("text")
+        .attr("class", "info name")
+        .style("font-weight", "bold")
+        .style("font-size", "120%");
+
+      svg.append("text").selectAll("tspan")
+        .data(["radius", "mass", "separation"])
+        .join("tspan")
+          .attr("class", d => `info ${d}`)
+          .attr("x", 0)
+          .attr("y", (d, i) => `${2 + 1.5*i}em`);
+
+      var pack = d3.pack()
+        .size([size, size])
+        .padding(5);
+
+      var color = d3.scaleLinear()
+        .domain([0, 1.6])
+        .range(["#fff", "#1f77b4"])
+        .clamp(true);
+
       var root = d3.hierarchy({ children: data })
         .sum(d => d.radius);
 
       var nodes = svg.append("g")
         .attr("transform", `translate(${(width-size)/2},${(height-size)/2})`);
-
-      function change(prop) {
-        root.sort(sortBy(prop));
-        render();
-      };
-
-      change(d3.select("#control-exoplanets-sorting").select("input:checked").property("value"));
-
-      d3.select("#control-exoplanets-sorting").selectAll("input")
-        .on("change", function() { change(this.value); });
 
       function render() {
         d3.selectAll(".info")
@@ -119,9 +102,9 @@ export function create(el, props) {
             .on("click", focus)
             .on("mouseover", focus)
             .transition().duration(750)
-              .attr("cx", d => d.x)
-              .attr("cy", d => d.y)
-              .attr("r", d => d.r);
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+            .attr("r", d => d.r);
       }
 
       function focus(event, d) {
@@ -135,21 +118,41 @@ export function create(el, props) {
           .text(d.data.name);
 
         svg.select(".info.radius")
-          .call(subscript, `Radius: ${numberFmt(d.data.radius, 2)} R`, "Jupiter");
+          .call(subscript, `Radius: ${numberFormat(d.data.radius, 2)} R`, "Jupiter");
 
         svg.select(".info.mass")
-          .call(subscript, `Mass: ${numberFmt(d.data.mass, 3)} M`, "Jupiter");
+          .call(subscript, `Mass: ${numberFormat(d.data.mass, 3)} M`, "Jupiter");
 
         svg.select(".info.separation")
-          .text(`Separation: ${numberFmt(d.data.separation, 2)} AU`);
+          .text(`Separation: ${numberFormat(d.data.separation, 2)} AU`);
       }
+
+      function change(prop) {
+        root.sort(sortBy(prop));
+        render();
+      };
+
+      var defaultSorting = d3.select("#control-exoplanets-sorting")
+        .select("input:checked").property("value");
+
+      change(defaultSorting);
+
+      d3.select("#control-exoplanets-sorting").selectAll("input")
+        .on("change", function() { change(this.value); });
     })
     .catch(function() {
       svg.select(".message")
         .text("Failed to load data.");
     });
 
-  function numberFmt(x, p) {
+  function sortBy(prop) {
+    if (typeof prop !== "undefined" && prop != "undefined")
+      return (a, b) => a.data[prop] - b.data[prop];
+    else
+      return (a, b) => Math.round(Math.random()) * 2 - 1;
+  }
+
+  function numberFormat(x, p) {
     return d3.format("." + p + "f")(x);
   }
 

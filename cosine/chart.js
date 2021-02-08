@@ -90,11 +90,11 @@ export function create(el, props) {
 
   svg.selectAll(".circle")
     .data(d3.range(2))
-  .enter().append("circle")
-    .attr("class", "circle")
-    .attr("cx", x(0))
-    .attr("cy", y(1))
-    .attr("r", 5);
+    .join("circle")
+      .attr("class", "circle")
+      .attr("cx", x(0))
+      .attr("cy", y(1))
+      .attr("r", 5);
 
   timer = d3.interval(function() {
     p += dp;

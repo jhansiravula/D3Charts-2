@@ -76,7 +76,7 @@ export function create(el, props) {
 
   sampling = $.Deferred();
 
-  var xc, yc, lnprobfn;
+  var xc, yc, logLikelihood;
   var projection = d3.geoIdentity();
 
   var ngrid = 100;
@@ -93,9 +93,9 @@ export function create(el, props) {
 
   var data = {
     rosenbrock: { x0: -2, x1: 2, y0: -2, y1: 3, z: [-60, -30, -20, -10],
-      lnprobfn: d => -(100 * Math.pow(d[1] - d[0]*d[0], 2) + Math.pow(d[0] - 1, 2)) },
+      logLikelihood: d => -(100 * Math.pow(d[1] - d[0]*d[0], 2) + Math.pow(d[0] - 1, 2)) },
     booth: { x0: 1-4, x1: 1+4, y0: 3-4, y1: 3+4, z: [-20, -15, -10, -5],
-      lnprobfn: d => -(Math.pow(d[0] + 2 * d[1] - 7, 2) + Math.pow(2 * d[0] + d[1] - 5, 2)) }
+      logLikelihood: d => -(Math.pow(d[0] + 2 * d[1] - 7, 2) + Math.pow(2 * d[0] + d[1] - 5, 2)) }
   };
 
   function linspace(domain, n){
@@ -109,7 +109,7 @@ export function create(el, props) {
     var d = data[value];
 
     xc = 0; yc = 1;
-    lnprobfn = d.lnprobfn;
+    logLikelihood = d.logLikelihood;
 
     // redraw contours
 
@@ -124,7 +124,7 @@ export function create(el, props) {
     var y = linspace(y2grid.domain(), ngrid);
     for (var j = 0, k = 0; j < ngrid; ++j) {
       for (var i = 0; i < ngrid; ++i, ++k) {
-        values[k] = lnprobfn([x[i], y[j]]);
+        values[k] = logLikelihood([x[i], y[j]]);
       }
     }
 
@@ -143,10 +143,10 @@ export function create(el, props) {
         .attr("stroke", "#C0C0C0")
         .attr("d", d3.geoPath(projection));
 
-    restart();
+    start();
   }
 
-  function restart() {
+  function start() {
     svg.selectAll(".walker")
       .remove();
 
@@ -158,8 +158,8 @@ export function create(el, props) {
 
     var initialPosition = d3.range(nwalkers).map(() => [xc + (Math.random() - 0.5), yc + (Math.random() - 0.5)]);
 
-    sampling = MCMC.sample(lnprobfn, initialPosition, niter)
-      .progress(result => render(result))
+    sampling = MCMC.sample(logLikelihood, initialPosition, niter)
+      .progress(result => render(result));
   }
 
   function render(result) {
@@ -192,7 +192,10 @@ export function create(el, props) {
 
   // initial rendering
 
-  change(d3.select("#control-mcmc-fn").select("input:checked").property("value"));
+  var defaultFunction = d3.select("#control-mcmc-fn")
+    .select("input:checked").property("value");
+
+  change(defaultFunction);
 
   // controls
 
@@ -206,7 +209,7 @@ export function create(el, props) {
     xc = x2grid.invert(pointer[0]);
     yc = y2grid.invert(pointer[1]);
 
-    restart();
+    start();
   });
 
 };
