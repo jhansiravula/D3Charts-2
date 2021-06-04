@@ -8,7 +8,8 @@ const d3 = Object.assign({},
 import React from "react";
 import { Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
-var url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+hostname,pl_orbsmax,pl_bmassj,pl_radj+from+ps+where+pl_orbsmax+is+not+null+and+pl_bmassj+is+not+null+and+pl_radj+is+not+null&format=csv"
+//var url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+hostname,pl_orbsmax,pl_bmassj,pl_radj+from+ps+where+pl_orbsmax+is+not+null+and+pl_bmassj+is+not+null+and+pl_radj+is+not+null&format=csv"
+import dataSrc from "./data.csv"
 
 export const id = "exoplanets";
 export const name = "Exoplanets";
@@ -52,9 +53,9 @@ export function create(el, props) {
   svg.append("text")
     .attr("class", "message")
     .attr("alignment-baseline", "hanging")
-    .text("Loading data from the NASA Exoplanet Archive ...");
+    .text("Loading data ...");
 
-  d3.csv(url, row)
+  d3.csv(dataSrc, row)
     .then(function(data) {
       svg.select(".message")
         .remove();
