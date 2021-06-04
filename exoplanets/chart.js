@@ -8,7 +8,7 @@ const d3 = Object.assign({},
 import React from "react";
 import { Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
-var url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?&table=exoplanets&select=pl_hostname,pl_orbsmax,pl_bmassj,pl_radj&where=pl_orbsmax%20is%20not%20null%20and%20pl_bmassj%20is%20not%20null%20and%20pl_radj%20is%20not%20null&format=csv";
+var url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+hostname,pl_orbsmax,pl_bmassj,pl_radj+from+ps+where+pl_orbsmax+is+not+null+and+pl_bmassj+is+not+null+and+pl_radj+is+not+null&format=csv"
 
 export const id = "exoplanets";
 export const name = "Exoplanets";
@@ -171,7 +171,7 @@ export function create(el, props) {
 
   function row(d) {
     var eps = 1e-9;
-    d.name = d.pl_hostname;
+    d.name = d.hostname;
     d.mass = d.pl_bmassj ? +d.pl_bmassj + eps * Math.random() : Infinity;
     d.radius = d.pl_radj ? +d.pl_radj + eps * Math.random() : Infinity;
     d.separation = d.pl_orbsmax ? +d.pl_orbsmax + eps * Math.random() : Infinity;
